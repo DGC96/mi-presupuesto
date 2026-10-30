@@ -17,8 +17,11 @@ self.addEventListener('activate', e => {
 // Primero la red (para recibir actualizaciones); si no hay conexión, la copia guardada
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // Siempre se pregunta al servidor si hay versión nueva (sin esperar a que caduque la copia del navegador)
+  const mismoSitio = new URL(e.request.url).origin === self.location.origin;
+  const peticion = mismoSitio ? new Request(e.request.url, {cache: 'no-cache', credentials: 'same-origin'}) : e.request;
   e.respondWith(
-    fetch(e.request)
+    fetch(peticion)
       .then(r => {
         const copia = r.clone();
         caches.open(VERSION).then(c => c.put(e.request, copia));
