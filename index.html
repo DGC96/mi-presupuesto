@@ -127,6 +127,11 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .fijo-form{margin-top:14px}
 .secundario-btn{background:var(--surface);color:var(--accent);border:1px solid var(--line);border-radius:10px;padding:14px;font-weight:600}
 .primario.mitad{grid-column:auto}
+.gasto[data-id]{cursor:pointer;border-radius:8px;margin:0 -8px;padding-left:8px;padding-right:0}
+.gasto[data-id]:active{background:var(--track)}
+.gasto.editando{background:var(--track);outline:2px solid var(--accent)}
+.editando-aviso{font-size:.88rem;font-weight:600;color:var(--accent);margin:0 0 8px}
+.pista{font-size:.82rem;color:var(--muted);margin:-6px 0 10px}
 .copia{display:flex;gap:10px;flex-wrap:wrap}
 .copia button,.copia label{flex:1;min-width:140px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-weight:600;color:var(--accent);cursor:pointer}
 .copia input{display:none}
@@ -179,6 +184,54 @@ const extraLimite = mes => (mes.ingresos||[]).filter(g=>g.alLimite).reduce((s,g)
 const nuevoId = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let tipoMov = 'gasto';
 let fijoFormAbierto = false;
+// ---- Importar pagos de Apple Pay (archivo creado por el atajo) ----
+function parseImporte(t){
+  let x = String(t).replace(/[^\d,.\-−]/g,'').replace('−','-');
+  const neg = x.startsWith('-'); x = x.replace(/-/g,'');
+  const c = x.lastIndexOf(','), d = x.lastIndexOf('.');
+  if(c>=0 && d>=0){ x = c>d ? x.replace(/\./g,'').replace(',','.') : x.replace(/,/g,''); }
+  else if(c>=0){ x = x.replace(/,/g,(m,i)=> i===c ? '.' : ''); }
+  else if(d>=0 && /^\d{1,3}(\.\d{3})+$/.test(x)){ x = x.replace(/\./g,''); }
+  const n = parseFloat(x);
+  return isNaN(n) ? NaN : Math.round((neg?-n:n)*100)/100;
+}
+function parseFecha(t){
+  t = String(t).trim();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+  m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;
+  return null;
+}
+function importarApplePay(texto){
+  estado.importados = estado.importados || [];
+  const vistos = new Set(estado.importados);
+  let nuevos = 0, ignorados = 0, malos = 0;
+  texto.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(linea=>{
+    const partes = linea.split(';');
+    if(partes.length < 2){ malos++; return; }
+    const fecha = parseFecha(partes[0]);
+    const importe = parseImporte(partes[1]);
+    const comercio = partes.slice(2).join(';').trim();
+    if(!fecha || isNaN(importe) || importe===0){ malos++; return; }
+    if(vistos.has(linea)) return;
+    vistos.add(linea); estado.importados.push(linea);
+    const [y,mm] = fecha.split('-').map(Number);
+    if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
+    const k = `${y}-${pad(mm)}`;
+    estado.meses[k] = estado.meses[k] || {gastos:[]};
+    const mesK = estado.meses[k];
+    mesK.ingresos = mesK.ingresos || [];
+    const mov = {id: nuevoId(), importe: Math.abs(importe), concepto: comercio || 'Apple Pay', fecha, origen:'applepay'};
+    if(importe < 0){ mov.concepto = 'Devolución ' + (comercio||''); mov.alLimite = true; mesK.ingresos.push(mov); }
+    else mesK.gastos.push(mov);
+    nuevos++;
+  });
+  if(estado.importados.length > 3000) estado.importados = estado.importados.slice(-3000);
+  return {nuevos, ignorados, malos};
+}
+
+let editMov = null; // {id, tipo} del movimiento que se está modificando
 
 // ---- Pagos fijos (letras, cuotas, recibos) ----
 const idxMes = k => { const [y,m] = k.split('-').map(Number); return y*12 + (m-1); };
@@ -267,7 +320,7 @@ function render(){
       render(); await guardar();
     };
     document.getElementById('guardar-lim').onclick = ok;
-    const c = document.getElementById('cancelar'); if(c) c.onclick = ()=>{ editandoLimite=false; render(); };
+    const c = document.getElementById('cancelar'); if(c) c.onclick = ()=>{ editandoLimite=false; editMov=null; render(); };
     ['saldo','lim'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') ok(); });
     return;
   }
@@ -318,7 +371,7 @@ function render(){
     const etiqueta = f===isoHoy ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'});
     const gastoDia = porDia[f].filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
     return `<div class="dia"><div class="dia-cab"><span style="text-transform:capitalize">${etiqueta}</span><span class="num">${gastoDia>0?'Gastado '+fmt(gastoDia):''}</span></div>
-      ${porDia[f].map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo}"><span class="concepto"></span><span class="imp num">${g.tipo==='ingreso'?'+':''}${fmt(g.importe)}</span>
+      ${porDia[f].map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo} ${editMov && editMov.id===g.id?'editando':''}" data-id="${g.id}" data-tipo="${g.tipo}" role="button" tabindex="0" aria-label="Modificar movimiento"><span class="concepto"></span><span class="imp num">${g.tipo==='ingreso'?'+':''}${fmt(g.importe)}</span>
       <button class="borrar" data-id="${g.id}" data-tipo="${g.tipo}" aria-label="Borrar ${g.tipo}">×</button></div>`; }).join('')}</div>`;
   }).join('') : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero arriba.</p>';
 
@@ -345,7 +398,8 @@ function render(){
       <button class="ajustar" id="ajustar">El banco me dice otra cantidad</button>
     </div>
 
-    <section>
+    <section id="form-mov">
+      ${editMov?'<p class="editando-aviso">Modificando un movimiento</p>':''}
       <div class="selector" role="tablist">
         <button role="tab" aria-selected="${!esIngreso}" data-tipo="gasto" class="${!esIngreso?'activo':''}">Gasto</button>
         <button role="tab" aria-selected="${esIngreso}" data-tipo="ingreso" class="${esIngreso?'activo':''}">Ingreso</button>
@@ -356,7 +410,17 @@ function render(){
         <label class="ancho">Concepto<input id="g-con" type="text" maxlength="60" placeholder="${esIngreso?'Nómina, bizum, devolución…':'Supermercado, cena, gasolina…'}"></label>
         ${esIngreso?`<label class="ancho check"><input id="g-lim" type="checkbox"> <span>Sumarlo también a lo que puedo gastar este mes</span></label>`:''}
         <p class="error" id="g-err"></p>
-        <button class="primario ${esIngreso?'verde':''}" id="g-add">${esIngreso?'Añadir ingreso':'Añadir gasto'}</button>
+        ${editMov ? `<button class="secundario-btn" id="g-cancel">Cancelar</button>
+        <button class="primario mitad ${esIngreso?'verde':''}" id="g-add">Guardar cambios</button>`
+        : `<button class="primario ${esIngreso?'verde':''}" id="g-add">${esIngreso?'Añadir ingreso':'Añadir gasto'}</button>`}
+      </div>
+    </section>
+
+    <section>
+      <h2>Pagos con Apple Pay</h2>
+      <p class="copia-nota">Trae los pagos que el atajo ha ido apuntando. Puedes importar el mismo archivo todas las veces que quieras: los pagos repetidos no se duplican.</p>
+      <div class="copia">
+        <label>Importar pagos de Apple Pay<input type="file" id="importar-ap" accept=".txt,text/plain"></label>
       </div>
     </section>
 
@@ -389,16 +453,18 @@ function render(){
 
     <section>
       <h2>Movimientos</h2>
+      ${fechas.length?'<p class="pista">Toca un movimiento para modificarlo.</p>':''}
       ${listado}
     </section>`;
 
   // conceptos con textContent (evita inyectar HTML)
   const conceptos = app.querySelectorAll('.gasto .concepto');
-  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':''); });
+  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':'') + (g.origen==='applepay'?' · Apple Pay':''); });
 
   app.querySelectorAll('.selector button').forEach(b=>b.onclick = ()=>{
     const imp = document.getElementById('g-imp').value, con = document.getElementById('g-con').value, fe = document.getElementById('g-fecha').value;
     tipoMov = b.dataset.tipo; render();
+    document.getElementById('g-imp').dataset.relleno = '1';
     document.getElementById('g-imp').value = imp; document.getElementById('g-con').value = con; document.getElementById('g-fecha').value = fe;
   });
   document.getElementById('editar').onclick = ()=>{ editandoLimite = true; render(); };
@@ -410,17 +476,60 @@ function render(){
     mes.saldoInicial = Math.round((v + total - ingresos + fijosCobr)*100)/100;
     render(); await guardar();
   };
+  // Rellenar el formulario si estamos modificando
+  const movEditado = editMov ? (editMov.tipo==='ingreso'?mes.ingresos:mes.gastos).find(g=>g.id===editMov.id) : null;
+  if(editMov && !movEditado) editMov = null;
+  if(movEditado && !document.getElementById('g-imp').dataset.relleno){
+    document.getElementById('g-imp').value = movEditado.importe.toFixed(2).replace('.',',');
+    document.getElementById('g-con').value = movEditado.concepto || '';
+    document.getElementById('g-fecha').value = movEditado.fecha;
+    const chk = document.getElementById('g-lim'); if(chk) chk.checked = !!movEditado.alLimite;
+  }
+  document.getElementById('importar-ap').onchange = async e=>{
+    const f = e.target.files[0]; e.target.value = '';
+    if(!f) return;
+    const aviso = document.getElementById('aviso');
+    try{
+      const r = importarApplePay(await f.text());
+      render(); await guardar();
+      let msg = r.nuevos ? `Importados ${r.nuevos} pago${r.nuevos===1?'':'s'} nuevo${r.nuevos===1?'':'s'}.` : 'No había pagos nuevos.';
+      if(r.malos) msg += ` ${r.malos} línea${r.malos===1?'':'s'} no se pudo leer.`;
+      alert(msg);
+      aviso.textContent = '';
+    }catch(err){
+      alert('No se pudo leer ese archivo.');
+    }
+  };
+  const gc = document.getElementById('g-cancel');
+  if(gc) gc.onclick = ()=>{ editMov = null; render(); };
+  app.querySelectorAll('.gasto[data-id]').forEach(row=>{
+    const abrirEdicion = ()=>{
+      editMov = {id: row.dataset.id, tipo: row.dataset.tipo};
+      tipoMov = row.dataset.tipo;
+      render();
+      document.getElementById('form-mov').scrollIntoView({behavior:'smooth', block:'start'});
+    };
+    row.onclick = e=>{ if(e.target.closest('.borrar')) return; abrirEdicion(); };
+    row.onkeydown = e=>{ if((e.key==='Enter'||e.key===' ') && !e.target.closest('.borrar')){ e.preventDefault(); abrirEdicion(); } };
+  });
   const add = async ()=>{
     const imp = num(document.getElementById('g-imp').value);
     const fecha = document.getElementById('g-fecha').value;
     const err = document.getElementById('g-err');
     if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
     if(!fecha || fecha<minF || fecha>maxF){ err.textContent = 'Elige una fecha de este mes.'; return; }
-    const mov = {id: nuevoId(), importe: imp, concepto: document.getElementById('g-con').value.trim(), fecha};
-    if(tipoMov==='ingreso'){ mov.alLimite = document.getElementById('g-lim').checked; mes.ingresos.push(mov); }
-    else mes.gastos.push(mov);
+    const mov = {id: editMov ? editMov.id : nuevoId(), importe: imp, concepto: document.getElementById('g-con').value.trim(), fecha};
+    if(tipoMov==='ingreso') mov.alLimite = document.getElementById('g-lim').checked;
+    const eraEdicion = !!editMov;
+    if(editMov){
+      // quitar la versión anterior (puede haber cambiado de gasto a ingreso o al revés)
+      if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
+      else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
+      editMov = null;
+    }
+    if(tipoMov==='ingreso') mes.ingresos.push(mov); else mes.gastos.push(mov);
     render(); await guardar();
-    document.getElementById('g-imp').focus();
+    if(!eraEdicion) document.getElementById('g-imp').focus();
   };
   document.getElementById('g-add').onclick = add;
   ['g-imp','g-con'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') add(); });
@@ -461,6 +570,7 @@ function render(){
     render(); await guardar();
   });
   app.querySelectorAll('.borrar:not(.quitar-fijo)').forEach(b=>b.onclick = async ()=>{
+    if(editMov && editMov.id===b.dataset.id) editMov = null;
     if(b.dataset.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==b.dataset.id);
     else mes.gastos = mes.gastos.filter(g=>g.id!==b.dataset.id);
     render(); await guardar();
@@ -494,9 +604,9 @@ function grafico(mes, nDias, limEf){
 
 document.getElementById('prev').onclick = ()=>{
   if(vista.y*12+vista.m <= INICIO.y*12+INICIO.m) return;
-  vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; render();
+  vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; editMov=null; render();
 };
-document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; render(); };
+document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; editMov=null; render(); };
 
 // Arranque: primero copia local, luego base de datos privada si está disponible
 try{ const raw = localStorage.getItem(LS_KEY); if(raw) estado = JSON.parse(raw); }catch(e){}
