@@ -60,10 +60,12 @@ button{cursor:pointer}
 .barra{position:relative;height:18px;background:var(--track);border-radius:9px;overflow:visible}
 .barra .lleno{height:100%;border-radius:9px;background:var(--good);transition:width .4s ease}
 .barra .ritmo{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink);opacity:.55}
-.leyenda{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-top:8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-top:8px}
 
 .diario{margin-top:20px;padding:16px 18px;border-radius:14px;background:var(--goodsoft)}
 .diario.mal{background:var(--badsoft)}
+.diario .etq-diario{font-size:.9rem;color:var(--muted);margin:0 0 2px}
+.diario .grande.negativo{color:var(--bad)}
 .diario p{margin:0}
 .diario .grande{font-size:2rem;font-weight:800;letter-spacing:-.02em}
 .diario .sub{font-size:.9rem;color:var(--muted);margin-top:2px}
@@ -458,9 +460,26 @@ function render(){
   } else if(queda<0){
     diario = `<div class="diario mal"><p class="grande num">Te has pasado ${fmt(-queda)}</p><p class="sub">Intenta no gastar más hasta que acabe el mes.</p></div>`;
   } else {
-    const porDiaPerm = queda/diasRestantes;
-    diario = `<div class="diario"><p class="grande num">${fmt(porDiaPerm)} al día</p>
-      <p class="sub">es lo que puedes gastar durante ${diasRestantes===1?'el último día':`los ${diasRestantes} días que quedan`}${esActual?` · hoy llevas ${fmt(gastadoHoy)}`:''}</p></div>`;
+    if(esActual){
+      // Hucha diaria: cada día se suma la parte del mes que le toca; lo que sobra o falta se arrastra
+      const base = limEf / nDias;
+      const gastadoHastaHoy = mes.gastos.filter(g=>g.fecha<=isoHoy).reduce((s,g)=>s+g.importe,0);
+      const hucha = base * hoy.getDate() - gastadoHastaHoy;
+      const mediaResto = diasRestantes > 1 ? queda / (diasRestantes - 1) : null;
+      const lineaMedia = mediaResto!==null ? `<br>Media para el resto del mes: ${fmt(mediaResto)} al día` : '';
+      if(hucha >= 0){
+        diario = `<div class="diario"><p class="etq-diario">Hoy puedes gastar</p><p class="grande num">${fmt(hucha)}</p>
+          <p class="sub">Cada día se suman ${fmt(base)} · hoy llevas ${fmt(gastadoHoy)}<br>Lo que no gastes se acumula para mañana${lineaMedia}</p></div>`;
+      } else {
+        const diasRecuperar = Math.ceil(-hucha / base);
+        diario = `<div class="diario mal"><p class="etq-diario">Vas en negativo</p><p class="grande num negativo">${fmt(hucha)}</p>
+          <p class="sub">Cada día se suman ${fmt(base)} · hoy llevas ${fmt(gastadoHoy)}<br>Si no gastas nada, lo compensarás ${diasRecuperar===1?'mañana':`en ${diasRecuperar} días`}${lineaMedia}</p></div>`;
+      }
+    } else {
+      const porDiaPerm = queda/diasRestantes;
+      diario = `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(porDiaPerm)} al día</p>
+        <p class="sub">durante los ${diasRestantes} días del mes</p></div>`;
+    }
   }
 
   // agrupar movimientos por día
