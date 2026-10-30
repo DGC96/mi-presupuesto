@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi presupuesto</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Presupuesto">
+<meta name="theme-color" content="#EEF2F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1720" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EEF2F5; --surface:#FFFFFF; --ink:#16232E; --muted:#5D6B78;
+  --line:#D5DDE4; --good:#1F8A70; --goodsoft:#D6EFE7; --warn:#C8811A; --bad:#C2413B; --badsoft:#F6DCDA;
+  --accent:#23507A; --track:#DCE3EA;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F1720; --surface:#17222D; --ink:#E7EEF4; --muted:#93A3B2;
+    --line:#2A3846; --good:#4CC39E; --goodsoft:#173A31; --warn:#E3A44A; --bad:#EE7A73; --badsoft:#3E2222;
+    --accent:#8DB8E0; --track:#24313E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1720; --surface:#17222D; --ink:#E7EEF4; --muted:#93A3B2;
+  --line:#2A3846; --good:#4CC39E; --goodsoft:#173A31; --warn:#E3A44A; --bad:#EE7A73; --badsoft:#3E2222;
+  --accent:#8DB8E0; --track:#24313E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;font-size:16px;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:16px max(18px,env(safe-area-inset-right,0px)) 48px max(18px,env(safe-area-inset-left,0px))}
+.num{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.mes{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mes h1{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1.05rem;font-weight:600;margin:0;text-transform:capitalize}
+.flecha{background:none;border:1px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:1.1rem;color:var(--muted)}
+
+.hero{padding:6px 0 22px}
+.hero .quedan{font-size:.95rem;color:var(--muted);margin:0}
+.hero .cifra{font-size:clamp(2.8rem,13vw,4rem);font-weight:700;line-height:1.05;letter-spacing:-.02em;margin:2px 0 4px}
+.hero .cifra.negativo{color:var(--bad)}
+.hero .de{color:var(--muted);margin:0 0 18px}
+.hero .de button{background:none;border:none;color:var(--accent);padding:0;text-decoration:underline;text-underline-offset:3px}
+
+.barra{position:relative;height:18px;background:var(--track);border-radius:9px;overflow:visible}
+.barra .lleno{height:100%;border-radius:9px;background:var(--good);transition:width .4s ease}
+.barra .ritmo{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink);opacity:.55}
+.leyenda{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-top:8px}
+
+.diario{margin-top:20px;padding:16px 18px;border-radius:14px;background:var(--goodsoft)}
+.diario.mal{background:var(--badsoft)}
+.diario p{margin:0}
+.diario .grande{font-size:1.6rem;font-weight:600}
+.diario .sub{font-size:.9rem;color:var(--muted);margin-top:2px}
+
+section{margin-top:30px}
+h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1rem;font-weight:600;margin:0 0 12px}
+
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form label{display:flex;flex-direction:column;font-size:.82rem;color:var(--muted);gap:4px}
+.form .ancho{grid-column:1/-1}
+.form input{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:1rem;width:100%;min-width:0}
+.form input.importe{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1.25rem}
+.primario{grid-column:1/-1;background:var(--accent);color:var(--surface);border:none;border-radius:10px;padding:14px;font-weight:600;font-size:1rem}
+.error{grid-column:1/-1;color:var(--bad);font-size:.88rem;margin:0;min-height:0}
+
+.grafico{overflow-x:auto}
+.grafico svg{display:block;width:100%;height:auto;min-width:300px}
+
+.dia{margin-bottom:16px}
+.dia-cab{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:4px}
+.gasto{display:flex;align-items:center;gap:10px;padding:8px 0}
+.gasto .concepto{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gasto .imp{font-weight:600}
+.borrar{background:none;border:none;color:var(--muted);font-size:1.2rem;width:32px;height:32px;border-radius:8px}
+.borrar:hover{background:var(--track)}
+.vacio{color:var(--muted);margin:0}
+
+.config{padding:30px 0}
+.config p{color:var(--muted);margin:0 0 14px}
+.config .fila{display:flex;gap:10px}
+.config input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:1.4rem;font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif}
+.config button{background:var(--accent);color:var(--surface);border:none;border-radius:10px;padding:0 20px;font-weight:600}
+.copia{display:flex;gap:10px;flex-wrap:wrap}
+.copia button,.copia label{flex:1;min-width:140px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-weight:600;color:var(--accent);cursor:pointer}
+.copia input{display:none}
+.copia-nota{font-size:.85rem;color:var(--muted);margin:0 0 12px}
+.aviso{font-size:.8rem;color:var(--muted);margin-top:36px;text-align:center}
+@media (prefers-reduced-motion:reduce){.barra .lleno{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <div class="mes">
+    <button class="flecha" id="prev" aria-label="Mes anterior">‹</button>
+    <h1 id="titulo-mes"></h1>
+    <button class="flecha" id="next" aria-label="Mes siguiente">›</button>
+  </div>
+  <div id="app"><p class="vacio">Cargando…</p></div>
+  <section>
+    <h2>Copia de seguridad</h2>
+    <p class="copia-nota">Tus datos se guardan solo en este iPhone. Haz una copia de vez en cuando y guárdala en Archivos o iCloud Drive.</p>
+    <div class="copia">
+      <button id="exportar">Guardar copia</button>
+      <label>Restaurar copia<input type="file" id="importar" accept="application/json,.json"></label>
+    </div>
+  </section>
+  <p class="aviso" id="aviso"></p>
+</main>
+
+<script>
+const eur = new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'});
+const fmt = n => eur.format(n);
+const hoy = new Date();
+const pad = n => String(n).padStart(2,'0');
+const isoHoy = `${hoy.getFullYear()}-${pad(hoy.getMonth()+1)}-${pad(hoy.getDate())}`;
+let vista = {y:hoy.getFullYear(), m:hoy.getMonth()}; // m 0-11
+let estado = {meses:{}};
+let editandoLimite = false;
+const LS_KEY = 'presupuesto-v1';
+
+const claveMes = (y,m) => `${y}-${pad(m+1)}`;
+const diasEnMes = (y,m) => new Date(y,m+1,0).getDate();
+const nombreMes = (y,m) => new Date(y,m,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+const mesActual = () => estado.meses[claveMes(vista.y,vista.m)];
+
+function limiteSugerido(){
+  // usa el límite del mes anterior más reciente como sugerencia
+  const claves = Object.keys(estado.meses).sort();
+  for(let i=claves.length-1;i>=0;i--){ if(estado.meses[claves[i]].limite) return estado.meses[claves[i]].limite; }
+  return '';
+}
+
+async function guardar(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(estado));
+  }catch(e){
+    document.getElementById('aviso').textContent = 'No se pudo guardar el último cambio. Revisa que el iPhone tenga espacio libre.';
+  }
+}
+
+function render(){
+  document.getElementById('titulo-mes').textContent = nombreMes(vista.y,vista.m);
+  const app = document.getElementById('app');
+  const mes = mesActual();
+
+  if(!mes || !mes.limite || editandoLimite){
+    const valor = mes?.limite || limiteSugerido();
+    app.innerHTML = `
+      <div class="config">
+        <h2>¿Cuánto puedes gastar este mes?</h2>
+        <p>Pon tu tope y ve apuntando lo que gastas. Te diré cada día cuánto te queda.</p>
+        <div class="fila">
+          <input id="lim" class="num" type="number" inputmode="decimal" min="1" step="1" placeholder="500" value="${valor}" aria-label="Límite mensual en euros">
+          <button id="guardar-lim">Guardar</button>
+        </div>
+      </div>`;
+    const inp = document.getElementById('lim');
+    const ok = async ()=>{
+      const v = parseFloat(String(inp.value).replace(',','.'));
+      if(!(v>0)){ inp.focus(); return; }
+      const k = claveMes(vista.y,vista.m);
+      estado.meses[k] = estado.meses[k] || {gastos:[]};
+      estado.meses[k].limite = Math.round(v*100)/100;
+      editandoLimite = false;
+      render(); await guardar();
+    };
+    document.getElementById('guardar-lim').onclick = ok;
+    inp.onkeydown = e=>{ if(e.key==='Enter') ok(); };
+    return;
+  }
+
+  const total = mes.gastos.reduce((s,g)=>s+g.importe,0);
+  const queda = mes.limite - total;
+  const nDias = diasEnMes(vista.y,vista.m);
+  const esActual = vista.y===hoy.getFullYear() && vista.m===hoy.getMonth();
+  const esPasado = new Date(vista.y,vista.m+1,1) <= new Date(hoy.getFullYear(),hoy.getMonth(),1);
+  const diaHoy = esActual ? hoy.getDate() : (esPasado ? nDias : 0);
+  const diasRestantes = esActual ? nDias - hoy.getDate() + 1 : (esPasado ? 0 : nDias);
+  const pct = Math.min(100, Math.max(0, total/mes.limite*100));
+  const ritmoPct = diaHoy/nDias*100;
+  const gastadoHoy = mes.gastos.filter(g=>g.fecha===isoHoy).reduce((s,g)=>s+g.importe,0);
+  const color = total>mes.limite ? 'var(--bad)' : (pct>ritmoPct+5 ? 'var(--warn)' : 'var(--good)');
+
+  let diario;
+  if(esPasado && !esActual){
+    diario = queda>=0
+      ? `<div class="diario"><p class="grande num">Ahorraste ${fmt(queda)}</p><p class="sub">Cerraste el mes por debajo de tu límite.</p></div>`
+      : `<div class="diario mal"><p class="grande num">Te pasaste ${fmt(-queda)}</p><p class="sub">Gastaste más de lo previsto este mes.</p></div>`;
+  } else if(queda<0){
+    diario = `<div class="diario mal"><p class="grande num">Te has pasado ${fmt(-queda)}</p><p class="sub">Intenta no gastar más hasta que acabe el mes.</p></div>`;
+  } else {
+    const porDia = queda/diasRestantes;
+    diario = `<div class="diario"><p class="grande num">${fmt(porDia)} al día</p>
+      <p class="sub">es lo que puedes gastar durante ${diasRestantes===1?'el último día':`los ${diasRestantes} días que quedan`}${esActual?` · hoy llevas ${fmt(gastadoHoy)}`:''}</p></div>`;
+  }
+
+  // agrupar por día
+  const porDia = {};
+  mes.gastos.forEach(g=>{ (porDia[g.fecha] = porDia[g.fecha] || []).push(g); });
+  const fechas = Object.keys(porDia).sort().reverse();
+  const listado = fechas.length ? fechas.map(f=>{
+    const d = new Date(f+'T12:00:00');
+    const etiqueta = f===isoHoy ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'});
+    const sum = porDia[f].reduce((s,g)=>s+g.importe,0);
+    return `<div class="dia"><div class="dia-cab"><span style="text-transform:capitalize">${etiqueta}</span><span class="num">${fmt(sum)}</span></div>
+      ${porDia[f].map(g=>`<div class="gasto"><span class="concepto"></span><span class="imp num">${fmt(g.importe)}</span>
+      <button class="borrar" data-id="${g.id}" aria-label="Borrar gasto">×</button></div>`).join('')}</div>`;
+  }).join('') : '<p class="vacio">Aún no has apuntado ningún gasto este mes. Empieza con el primero arriba.</p>';
+
+  const minF = `${vista.y}-${pad(vista.m+1)}-01`, maxF = `${vista.y}-${pad(vista.m+1)}-${pad(nDias)}`;
+  const fechaDef = esActual ? isoHoy : minF;
+
+  app.innerHTML = `
+    <div class="hero">
+      <p class="quedan">${queda>=0?'Te quedan':'Vas por encima'}</p>
+      <p class="cifra num ${queda<0?'negativo':''}">${fmt(Math.abs(queda))}</p>
+      <p class="de">de ${fmt(mes.limite)} · <button id="editar">cambiar límite</button></p>
+      <div class="barra" role="img" aria-label="Gastado ${Math.round(pct)}% del límite">
+        <div class="lleno" style="width:${pct}%;background:${color}"></div>
+        ${esActual?`<div class="ritmo" style="left:${ritmoPct}%" title="Dónde deberías ir hoy"></div>`:''}
+      </div>
+      <div class="leyenda"><span>Gastado ${fmt(total)}</span>${esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>
+      ${diario}
+    </div>
+
+    <section>
+      <h2>Apuntar un gasto</h2>
+      <div class="form">
+        <label>Importe (€)<input id="g-imp" class="importe" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0,00"></label>
+        <label>Fecha<input id="g-fecha" type="date" value="${fechaDef}" min="${minF}" max="${maxF}"></label>
+        <label class="ancho">Concepto<input id="g-con" type="text" maxlength="60" placeholder="Supermercado, cena, gasolina…"></label>
+        <p class="error" id="g-err"></p>
+        <button class="primario" id="g-add">Añadir gasto</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Gasto por día</h2>
+      <div class="grafico">${grafico(mes, nDias, diasRestantes, queda)}</div>
+    </section>
+
+    <section>
+      <h2>Movimientos</h2>
+      ${listado}
+    </section>`;
+
+  // conceptos con textContent (evita inyectar HTML)
+  let i=0; const conceptos = app.querySelectorAll('.gasto .concepto');
+  fechas.forEach(f=>porDia[f].forEach(g=>{ conceptos[i++].textContent = g.concepto || 'Sin concepto'; }));
+
+  document.getElementById('editar').onclick = ()=>{ editandoLimite = true; render(); };
+  const add = async ()=>{
+    const imp = parseFloat(String(document.getElementById('g-imp').value).replace(',','.'));
+    const fecha = document.getElementById('g-fecha').value;
+    const err = document.getElementById('g-err');
+    if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
+    if(!fecha || fecha<minF || fecha>maxF){ err.textContent = 'Elige una fecha de este mes.'; return; }
+    mes.gastos.push({id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), importe: Math.round(imp*100)/100, concepto: document.getElementById('g-con').value.trim(), fecha});
+    render(); await guardar();
+    document.getElementById('g-imp').focus();
+  };
+  document.getElementById('g-add').onclick = add;
+  ['g-imp','g-con'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') add(); });
+  app.querySelectorAll('.borrar').forEach(b=>b.onclick = async ()=>{
+    mes.gastos = mes.gastos.filter(g=>g.id!==b.dataset.id);
+    render(); await guardar();
+  });
+}
+
+function grafico(mes, nDias, diasRestantes, queda){
+  const sumas = Array(nDias).fill(0);
+  mes.gastos.forEach(g=>{ const d = parseInt(g.fecha.slice(8,10),10); if(d>=1&&d<=nDias) sumas[d-1]+=g.importe; });
+  const media = mes.limite/nDias;
+  const max = Math.max(media*1.6, ...sumas);
+  const W=360, H=140, top=10, base=H-22, bw=W/nDias;
+  const y = v => base - (v/max)*(base-top);
+  const esActual = vista.y===hoy.getFullYear() && vista.m===hoy.getMonth();
+  let barras = '';
+  sumas.forEach((v,i)=>{
+    const h = base - y(v);
+    const c = v>media ? 'var(--warn)' : 'var(--good)';
+    const esHoy = esActual && i===hoy.getDate()-1;
+    if(v>0) barras += `<rect x="${i*bw+1}" y="${y(v)}" width="${bw-2}" height="${h}" rx="2" fill="${c}"><title>Día ${i+1}: ${fmt(v)}</title></rect>`;
+    if(esHoy) barras += `<rect x="${i*bw+0.5}" y="${top}" width="${bw-1}" height="${base-top}" fill="none" stroke="var(--accent)" stroke-dasharray="2 2" rx="2"/>`;
+    if((i+1)%5===0 || i===0) barras += `<text x="${i*bw+bw/2}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--muted)">${i+1}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gasto diario del mes frente a la media permitida">
+    <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>
+    ${barras}
+    <line x1="0" x2="${W}" y1="${y(media)}" y2="${y(media)}" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="4 3"/>
+    <text x="${W-2}" y="${y(media)-4}" text-anchor="end" font-size="9" fill="var(--muted)">media permitida ${fmt(media)}/día</text>
+  </svg>`;
+}
+
+document.getElementById('prev').onclick = ()=>{ vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; render(); };
+document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; render(); };
+
+// Arranque: primero copia local, luego base de datos privada si está disponible
+try{ const raw = localStorage.getItem(LS_KEY); if(raw) estado = JSON.parse(raw); }catch(e){}
+if(!estado.meses) estado = {meses:{}};
+render();
+
+// Pedir almacenamiento persistente para que iOS no borre los datos
+if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); }
+
+// Copia de seguridad
+document.getElementById('exportar').onclick = async ()=>{
+  const nombre = `presupuesto-${isoHoy}.json`;
+  const blob = new Blob([JSON.stringify(estado,null,2)],{type:'application/json'});
+  const file = new File([blob], nombre, {type:'application/json'});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Copia de mi presupuesto'});
+      return;
+    }
+  }catch(e){ if(e && e.name==='AbortError') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+};
+document.getElementById('importar').onchange = async e=>{
+  const f = e.target.files[0]; e.target.value = '';
+  if(!f) return;
+  const aviso = document.getElementById('aviso');
+  try{
+    const datos = JSON.parse(await f.text());
+    if(!datos || typeof datos.meses!=='object') throw 0;
+    if(!confirm('Esto sustituirá los datos actuales por los de la copia. ¿Continuar?')) return;
+    estado = datos; editandoLimite = false;
+    render(); await guardar();
+    aviso.textContent = 'Copia restaurada.';
+  }catch(err){
+    aviso.textContent = 'Ese archivo no es una copia válida de esta app.';
+  }
+};
+
+// Modo sin conexión
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
