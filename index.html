@@ -190,6 +190,7 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .fijo.ingreso .imp{color:var(--good)}
 .fijo.ingreso .fijo-dia{color:var(--good)}
 .gasto .avatar{font-size:1.25rem}
+.nota-credito{font-size:.85rem;font-weight:600;color:var(--accent);background:var(--track);border-radius:8px;padding:6px 10px;margin:2px 0 10px;display:inline-block}
 .etq-credito{display:inline-block;align-self:flex-start;margin-top:4px;font-size:.75rem;font-weight:600;color:var(--accent);background:var(--track);border-radius:6px;padding:2px 7px}
 .gasto .imp.credito,.fijo.con-credito .imp{color:var(--muted)}
 .cats{display:flex;flex-direction:column;gap:6px}
@@ -896,7 +897,8 @@ function render(){
     </section>
 
     <section>
-      <div class="cab-seccion"><h2>Gastos programados</h2>${c.progTot?`<span class="num total-fijos">−${fmt(c.progTot)}</span>`:''}</div>
+      <div class="cab-seccion"><h2>Gastos programados</h2>${(c.progTot + suma(c.progsCred))?`<span class="num total-fijos">−${fmt(c.progTot + suma(c.progsCred))}</span>`:''}</div>
+      ${suma(c.progsCred) ? `<p class="nota-credito">💳 ${c.progTot ? `De ese total, ${fmt(suma(c.progsCred))} van con tarjeta de crédito y se cobrarán` : 'Con tarjeta de crédito: se cobrará'} el ${fmtFecha(c.cobroCred)}, en el mes que viene.</p>` : ''}
       <p class="copia-nota">Compras ya hechas que se cobrarán en una fecha concreta, como una preventa. Se descuentan del banco el día del cobro y, si cuentan en tu máximo, se reservan desde el principio del mes.</p>
       ${(c.progs.length || c.progsCred.length) ? [...c.progs, ...c.progsCred].sort((a,b)=>a.fecha<b.fecha?-1:1).map(filaProg).join('') : '<p class="vacio">No tienes gastos programados este mes.</p>'}
       ${masProgs.length ? `<p class="copia-nota" style="margin-top:10px">En los próximos meses: ${masProgs.length} gasto${masProgs.length===1?'':'s'} programado${masProgs.length===1?'':'s'} (${fmt(suma(masProgs))}).</p>`:''}
