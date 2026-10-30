@@ -210,6 +210,44 @@ function parseFecha(t){
   if(m) return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;
   return null;
 }
+// Lee el texto de una captura de la ventana de compra de Apple (App Store / compras en apps)
+function parseCaptura(txt){
+  const lineas = txt.split(/\s*\|\s*/).map(l=>l.trim()).filter(Boolean);
+  const dinero = /(\d{1,3}(?:\.\d{3})+,\d{2}|\d+,\d{2}|\d+\.\d{2})\s?€|€\s?(\d+[.,]\d{2})/;
+  const edad = /\s*\(?\b\d{1,2}\s?\+\)?\s*$/;
+  const ruido = /^(compras? en la app|app store|pulsa dos veces|para pagar|confirma con|cobro único|cuenta:|consulta los detalles|de \d+ días|suscripción|precio|\d{1,2}\s?\+)/i;
+  // Ancla: "Compra dentro de la app" (compras dentro de apps) o la clasificación por edad junto al nombre de la app
+  let iAncla = lineas.findIndex(l=>/compra dentro de la app/i.test(l));
+  let iApp = -1;
+  if(iAncla > 0){
+    iApp = iAncla - 1;
+    if(/^\d{1,2}\s?\+$/.test(lineas[iApp]) && iApp>0) iApp--; // "13+" en línea aparte
+  } else {
+    iApp = lineas.findIndex(l=>edad.test(l) && !/^\d{1,2}\s?\+$/.test(l));
+    if(iApp < 0){ const iEdad = lineas.findIndex(l=>/^\d{1,2}\s?\+$/.test(l)); if(iEdad>0) iApp = iEdad-1; }
+    iAncla = iApp;
+  }
+  let app = iApp>=0 ? lineas[iApp].replace(edad,'').trim() : '';
+  let articulo = '';
+  for(let k=iApp-1; k>=0 && iApp>=0; k--){ if(!ruido.test(lineas[k])){ articulo = lineas[k]; break; } }
+  if(articulo && articulo===app) articulo = '';
+  // Precio: el primero que aparece después del ancla (lo de arriba puede ser el fondo de la app)
+  let importe = NaN;
+  for(let k=Math.max(iAncla,0); k<lineas.length; k++){
+    const m = lineas[k].match(dinero);
+    if(m){ importe = parseImporteSimple(m[1]||m[2]); break; }
+  }
+  if(isNaN(importe)){ const m = txt.match(dinero); if(m) importe = parseImporteSimple(m[1]||m[2]); }
+  // Tarjeta: la línea anterior a "•••• 1234"
+  let tarjeta = '';
+  const iNum = lineas.findIndex(l=>/[•·.*∙●]{3,}\s*\d{4}/.test(l));
+  if(iNum>0) tarjeta = lineas[iNum-1].replace(/\s*(apple\s?pay|pay)\s*$/i,'').trim();
+  else { const m = txt.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ ]{3,})\s*\|?\s*[•·.*∙●]{3,}\s*\d{4}/); if(m) tarjeta = m[1].trim(); }
+  return {importe, app, articulo, tarjeta};
+}
+
+// Huella corta de cada línea importada (así no se guardan datos personales como el correo)
+function huella(t){ let h1=0x811c9dc5, h2=0x1b873593; for(let i=0;i<t.length;i++){ const c=t.charCodeAt(i); h1=Math.imul(h1^c,16777619); h2=Math.imul(h2^c,2246822519); } return (h1>>>0).toString(36)+(h2>>>0).toString(36); }
 function importarApplePay(texto){
   estado.importados = estado.importados || [];
   const vistos = new Set(estado.importados);
@@ -217,6 +255,29 @@ function importarApplePay(texto){
   const VENTANA = 5*60*1000; // 5 minutos
   texto.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(linea=>{
     let partes = linea.split(';');
+    // Líneas del atajo de capturas de compras: fecha;#CAPTURA;texto de la captura
+    if(partes.length >= 3 && partes[1].trim()==='#CAPTURA'){
+      const fecha = parseFecha(partes[0]);
+      const info = parseCaptura(partes.slice(2).join(';'));
+      if(!fecha || isNaN(info.importe) || info.importe<=0){ malos++; return; }
+      const hl = huella(linea); if(vistos.has(hl)) return;
+      vistos.add(hl); estado.importados.push(hl);
+      const [y,mm] = fecha.split('-').map(Number);
+      if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
+      const k = `${y}-${pad(mm)}`;
+      estado.meses[k] = estado.meses[k] || {gastos:[]};
+      const mesK = estado.meses[k];
+      mesK.ingresos = mesK.ingresos || [];
+      const hora = Date.parse(partes[0].trim().replace(' ','T')) || null;
+      const concepto = [info.app, info.articulo].filter(Boolean).join(': ') || 'Compra sin detalle';
+      // Si se hacen dos capturas de la misma ventana, solo cuenta una
+      const repetida = hora && mesK.gastos.some(g => g.origen==='captura' && g.hora && g.concepto===concepto
+        && Math.abs(g.importe-info.importe)<0.005 && Math.abs(g.hora-hora) <= 10*60*1000);
+      if(repetida){ duplicados++; return; }
+      mesK.gastos.push({id: nuevoId(), importe: info.importe, concepto, fecha, origen:'captura', hora, tarjeta: info.tarjeta});
+      nuevos++;
+      return;
+    }
     // Las líneas del atajo de notificaciones de Cartera terminan en ;#N
     const esNotif = partes.length >= 3 && partes[partes.length-1].trim() === '#N';
     if(esNotif) partes = partes.slice(0,-1);
@@ -231,8 +292,8 @@ function importarApplePay(texto){
       if(!esNotif) malos++;
       return;
     }
-    if(vistos.has(linea)) return;
-    vistos.add(linea); estado.importados.push(linea);
+    const hl = huella(linea); if(vistos.has(hl)) return;
+    vistos.add(hl); estado.importados.push(hl);
     const [y,mm] = fecha.split('-').map(Number);
     if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
     const k = `${y}-${pad(mm)}`;
@@ -445,7 +506,7 @@ function render(){
 
     <section>
       <h2>Pagos automáticos</h2>
-      <p class="copia-nota">Trae los pagos que los atajos de Apple Pay y Cartera han ido apuntando. Puedes importar el mismo archivo todas las veces que quieras: los pagos repetidos no se duplican.</p>
+      <p class="copia-nota">Trae los pagos que tus atajos han ido apuntando (Apple Pay y capturas de compras en apps). Puedes importar el mismo archivo todas las veces que quieras: los pagos repetidos no se duplican.</p>
       <div class="copia">
         <label>Importar pagos<input type="file" id="importar-ap" accept=".txt,text/plain"></label>
       </div>
@@ -486,7 +547,7 @@ function render(){
 
   // conceptos con textContent (evita inyectar HTML)
   const conceptos = app.querySelectorAll('.gasto .concepto');
-  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':'') + (g.origen==='applepay'?' · Apple Pay':g.origen==='cartera'?' · Cartera':''); });
+  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':'') + (g.origen==='applepay'?' · Apple Pay':g.origen==='cartera'?' · Cartera':g.origen==='captura'?' · Compra en app':'') + (g.tarjeta?' · '+g.tarjeta:''); });
 
   app.querySelectorAll('.selector button').forEach(b=>b.onclick = ()=>{
     const imp = document.getElementById('g-imp').value, con = document.getElementById('g-con').value, fe = document.getElementById('g-fecha').value;
@@ -520,7 +581,7 @@ function render(){
       const r = importarApplePay(await f.text());
       render(); await guardar();
       let msg = r.nuevos ? `Importados ${r.nuevos} pago${r.nuevos===1?'':'s'} nuevo${r.nuevos===1?'':'s'}.` : 'No había pagos nuevos.';
-      if(r.duplicados) msg += ` ${r.duplicados} repetido${r.duplicados===1?'':'s'} entre los dos atajos (no se han añadido).`;
+      if(r.duplicados) msg += ` ${r.duplicados} repetido${r.duplicados===1?'':'s'} (no se ha${r.duplicados===1?'':'n'} vuelto a añadir).`;
       if(r.malos) msg += ` ${r.malos} línea${r.malos===1?'':'s'} no se pudo leer.`;
       alert(msg);
       aviso.textContent = '';
