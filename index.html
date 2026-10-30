@@ -202,6 +202,8 @@ function parseImporte(t){
   if(m) return parseImporteSimple(m[1].replace(/\s/g,''));
   return parseImporteSimple(t);
 }
+// Los pagos del 30 y 31 de octubre de 2026 cuentan como 1 de noviembre (arranque de la app)
+function ajustarFecha(f){ return (f==='2026-10-30' || f==='2026-10-31') ? '2026-11-01' : f; }
 function parseFecha(t){
   t = String(t).trim();
   let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
@@ -240,9 +242,9 @@ function parseCaptura(txt){
   if(isNaN(importe)){ const m = txt.match(dinero); if(m) importe = parseImporteSimple(m[1]||m[2]); }
   // Tarjeta: la línea anterior a "•••• 1234"
   let tarjeta = '';
-  const iNum = lineas.findIndex(l=>/[•·.*∙●]{3,}\s*\d{4}/.test(l));
+  const iNum = lineas.findIndex(l=>/[•·.*∙●]{2,}\s*\d{4}/.test(l));
   if(iNum>0) tarjeta = lineas[iNum-1].replace(/\s*(apple\s?pay|pay)\s*$/i,'').trim();
-  else { const m = txt.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ ]{3,})\s*\|?\s*[•·.*∙●]{3,}\s*\d{4}/); if(m) tarjeta = m[1].trim(); }
+  else { const m = txt.match(/([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ ]{3,})\s*\|?\s*[•·.*∙●]{2,}\s*\d{4}/); if(m) tarjeta = m[1].trim(); }
   return {importe, app, articulo, tarjeta};
 }
 
@@ -257,10 +259,10 @@ function importarApplePay(texto){
     let partes = linea.split(';');
     // Líneas del atajo de capturas de compras: fecha;#CAPTURA;texto de la captura
     if(partes.length >= 3 && partes[1].trim()==='#CAPTURA'){
-      const fecha = parseFecha(partes[0]);
+      const fecha = ajustarFecha(parseFecha(partes[0]));
       const info = parseCaptura(partes.slice(2).join(';'));
       if(!fecha || isNaN(info.importe) || info.importe<=0){ malos++; return; }
-      const hl = huella(linea); if(vistos.has(hl)) return;
+      const hl = huella(/^2026-10-3[01]/.test(linea) ? linea+'#nov' : linea); if(vistos.has(hl)) return;
       vistos.add(hl); estado.importados.push(hl);
       const [y,mm] = fecha.split('-').map(Number);
       if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
@@ -272,7 +274,7 @@ function importarApplePay(texto){
       const concepto = [info.app, info.articulo].filter(Boolean).join(': ') || 'Compra sin detalle';
       // Si se hacen dos capturas de la misma ventana, solo cuenta una
       const repetida = hora && mesK.gastos.some(g => g.origen==='captura' && g.hora && g.concepto===concepto
-        && Math.abs(g.importe-info.importe)<0.005 && Math.abs(g.hora-hora) <= 10*60*1000);
+        && Math.abs(g.importe-info.importe)<0.005 && Math.abs(g.hora-hora) <= 60*1000);
       if(repetida){ duplicados++; return; }
       mesK.gastos.push({id: nuevoId(), importe: info.importe, concepto, fecha, origen:'captura', hora, tarjeta: info.tarjeta});
       nuevos++;
@@ -282,7 +284,7 @@ function importarApplePay(texto){
     const esNotif = partes.length >= 3 && partes[partes.length-1].trim() === '#N';
     if(esNotif) partes = partes.slice(0,-1);
     if(partes.length < 2){ if(!esNotif) malos++; return; }
-    const fecha = parseFecha(partes[0]);
+    const fecha = ajustarFecha(parseFecha(partes[0]));
     const importe = parseImporte(partes[1]);
     let comercio = partes.slice(2).join(';').trim();
     // En los avisos de Cartera el título no dice dónde se compró: se deja para revisar
@@ -292,7 +294,7 @@ function importarApplePay(texto){
       if(!esNotif) malos++;
       return;
     }
-    const hl = huella(linea); if(vistos.has(hl)) return;
+    const hl = huella(/^2026-10-3[01]/.test(linea) ? linea+'#nov' : linea); if(vistos.has(hl)) return;
     vistos.add(hl); estado.importados.push(hl);
     const [y,mm] = fecha.split('-').map(Number);
     if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
@@ -581,6 +583,7 @@ function render(){
       const r = importarApplePay(await f.text());
       render(); await guardar();
       let msg = r.nuevos ? `Importados ${r.nuevos} pago${r.nuevos===1?'':'s'} nuevo${r.nuevos===1?'':'s'}.` : 'No había pagos nuevos.';
+      if(r.ignorados) msg += ` ${r.ignorados} pago${r.ignorados===1?' es':'s son'} de antes de noviembre de 2026 y no se ha${r.ignorados===1?'':'n'} añadido.`;
       if(r.duplicados) msg += ` ${r.duplicados} repetido${r.duplicados===1?'':'s'} (no se ha${r.duplicados===1?'':'n'} vuelto a añadir).`;
       if(r.malos) msg += ` ${r.malos} línea${r.malos===1?'':'s'} no se pudo leer.`;
       alert(msg);
