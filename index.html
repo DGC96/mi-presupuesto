@@ -51,7 +51,8 @@ button{cursor:pointer}
 
 .hero{padding:6px 0 22px}
 .hero .quedan{font-size:.95rem;color:var(--muted);margin:0}
-.hero .cifra{font-size:clamp(2.8rem,13vw,4rem);font-weight:700;line-height:1.05;letter-spacing:-.02em;margin:2px 0 4px}
+.hero .cifra{font-size:clamp(3.4rem,17vw,5rem);font-weight:800;line-height:1;letter-spacing:-.035em;margin:4px 0 8px}
+.hero .cifra .dec{font-size:.42em;font-weight:700;letter-spacing:0;margin-left:2px}
 .hero .cifra.negativo{color:var(--bad)}
 .hero .de{color:var(--muted);margin:0 0 18px}
 .hero .de button{background:none;border:none;color:var(--accent);padding:0;text-decoration:underline;text-underline-offset:3px}
@@ -64,7 +65,7 @@ button{cursor:pointer}
 .diario{margin-top:20px;padding:16px 18px;border-radius:14px;background:var(--goodsoft)}
 .diario.mal{background:var(--badsoft)}
 .diario p{margin:0}
-.diario .grande{font-size:1.6rem;font-weight:600}
+.diario .grande{font-size:2rem;font-weight:800;letter-spacing:-.02em}
 .diario .sub{font-size:.9rem;color:var(--muted);margin-top:2px}
 
 section{margin-top:30px}
@@ -74,18 +75,27 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .form label{display:flex;flex-direction:column;font-size:.82rem;color:var(--muted);gap:4px}
 .form .ancho{grid-column:1/-1}
 .form input{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:1rem;width:100%;min-width:0}
-.form input.importe{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1.25rem}
+.form input.importe{font-weight:700;font-size:1.5rem;font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif}
 .primario{grid-column:1/-1;background:var(--accent);color:var(--surface);border:none;border-radius:10px;padding:14px;font-weight:600;font-size:1rem}
 .error{grid-column:1/-1;color:var(--bad);font-size:.88rem;margin:0;min-height:0}
 
 .grafico{overflow-x:auto}
 .grafico svg{display:block;width:100%;height:auto;min-width:300px}
 
-.dia{margin-bottom:16px}
-.dia-cab{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:4px}
-.gasto{display:flex;align-items:center;gap:10px;padding:8px 0}
-.gasto .concepto{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gasto .imp{font-weight:600}
+.dia{margin-bottom:18px}
+.dia-cab{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px;gap:10px}
+.dia-nombre{font-weight:600;font-size:.92rem;flex:1;min-width:0}
+.dia-total{font-weight:700;font-size:.95rem;color:var(--muted);white-space:nowrap}
+.dia-lista{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.gasto{display:flex;align-items:center;gap:12px;padding:13px 16px 13px 14px;border-top:1px solid var(--line)}
+.gasto:first-child{border-top:none}
+.gasto .avatar{width:40px;height:40px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;background:var(--track);color:var(--accent)}
+.gasto.ingreso .avatar{background:var(--goodsoft);color:var(--good);font-size:1.3rem}
+.gasto .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.gasto .concepto{font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.gasto .meta{font-size:.8rem;color:var(--muted);line-height:1.3}
+.gasto .imp{font-size:1.15rem;font-weight:700;white-space:nowrap;letter-spacing:-.01em}
+.gasto .borrar{width:30px;height:30px;font-size:1.1rem;flex:none}
 .borrar{background:none;border:none;color:var(--muted);font-size:1.2rem;width:32px;height:32px;border-radius:8px}
 .borrar:hover{background:var(--track)}
 .vacio{color:var(--muted);margin:0}
@@ -99,9 +109,9 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .config .fila button{flex:1;padding:14px 20px}
 .config .secundario{background:var(--surface);color:var(--accent);border:1px solid var(--line)}
 .banco{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.banco > div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.banco > div{display:flex;flex-direction:column;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .banco .etq{font-size:.82rem;color:var(--muted);margin:0;line-height:1.3}
-.banco .valor{font-size:1.25rem;font-weight:600;margin:4px 0 0}
+.banco .valor{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;margin:4px 0 0}
 .banco .valor.negativo{color:var(--bad)}
 .ajustar{background:none;border:none;color:var(--accent);padding:10px 0 0;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
 .config button{background:var(--accent);color:var(--surface);border:none;border-radius:10px;padding:0 20px;font-weight:600}
@@ -115,7 +125,7 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .nota-ingresos{font-size:.88rem;color:var(--muted);margin:10px 0 0}
 .cab-seccion{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .cab-seccion h2{margin-bottom:4px}
-.total-fijos{font-weight:600}
+.total-fijos{font-weight:800;font-size:1.15rem}
 .fijo{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .fijo-dia{width:40px;height:40px;flex:none;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:600}
 .fijo.hecho .fijo-dia{background:var(--goodsoft);border-color:transparent;color:var(--good)}
@@ -123,13 +133,14 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .fijo-nombre{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fijo-sub{font-size:.82rem;color:var(--muted)}
 .fijo.hecho .imp{color:var(--muted)}
-.fijo .imp{font-weight:600}
+.fijo .imp{font-weight:700;font-size:1.1rem}
 .fijo-form{margin-top:14px}
 .secundario-btn{background:var(--surface);color:var(--accent);border:1px solid var(--line);border-radius:10px;padding:14px;font-weight:600}
 .primario.mitad{grid-column:auto}
-.gasto[data-id]{cursor:pointer;border-radius:8px;margin:0 -8px;padding-left:8px;padding-right:0}
+.peligro{grid-column:1/-1;background:none;border:none;color:var(--bad);font-weight:600;padding:10px}
+.gasto[data-id]{cursor:pointer}
 .gasto[data-id]:active{background:var(--track)}
-.gasto.editando{background:var(--track);outline:2px solid var(--accent)}
+.gasto.editando{background:var(--track);box-shadow:inset 4px 0 0 var(--accent)}
 .editando-aviso{font-size:.88rem;font-weight:600;color:var(--accent);margin:0 0 8px}
 .pista{font-size:.82rem;color:var(--muted);margin:-6px 0 10px}
 .copia{display:flex;gap:10px;flex-wrap:wrap}
@@ -160,8 +171,10 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 </main>
 
 <script>
-const eur = new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'});
-const fmt = n => eur.format(n);
+const partesImporte = n => { const neg = n < 0; const [e,d] = Math.abs(n).toFixed(2).split('.'); return {neg, ent: e.replace(/\B(?=(\d{3})+(?!\d))/g,'.'), dec: d}; };
+const fmt = n => { const p = partesImporte(n); return `${p.neg?'−':''}${p.ent},${p.dec}\u00a0€`; };
+// Versión destacada: euros grandes y céntimos más pequeños
+const fmtGrande = n => { const p = partesImporte(n); return `${p.neg?'−':''}${p.ent}<span class="dec">,${p.dec}\u00a0€</span>`; };
 const hoy = new Date();
 const pad = n => String(n).padStart(2,'0');
 const isoHoy = `${hoy.getFullYear()}-${pad(hoy.getMonth()+1)}-${pad(hoy.getDate())}`;
@@ -458,12 +471,16 @@ function render(){
   const orden = [];
   const listado = fechas.length ? fechas.map(f=>{
     const d = new Date(f+'T12:00:00');
-    const etiqueta = f===isoHoy ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'});
-    const gastoDia = porDia[f].filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
-    return `<div class="dia"><div class="dia-cab"><span style="text-transform:capitalize">${etiqueta}</span><span class="num">${gastoDia>0?'Gastado '+fmt(gastoDia):''}</span></div>
-      ${porDia[f].map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo} ${editMov && editMov.id===g.id?'editando':''}" data-id="${g.id}" data-tipo="${g.tipo}" role="button" tabindex="0" aria-label="Modificar movimiento"><span class="concepto"></span><span class="imp num">${g.tipo==='ingreso'?'+':''}${fmt(g.importe)}</span>
-      <button class="borrar" data-id="${g.id}" data-tipo="${g.tipo}" aria-label="Borrar ${g.tipo}">×</button></div>`; }).join('')}</div>`;
-  }).join('') : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero arriba.</p>';
+    const diaTxt = d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'}).replace(',','');
+    const etiqueta = (f===isoHoy ? 'Hoy · ' : '') + diaTxt.charAt(0).toUpperCase()+diaTxt.slice(1);
+    const items = porDia[f].slice().sort((a,b)=>(b.hora||0)-(a.hora||0));
+    const gastoDia = items.filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
+    return `<div class="dia"><div class="dia-cab"><span class="dia-nombre">${etiqueta}</span><span class="num dia-total">${gastoDia>0?'Gastado '+fmt(gastoDia):''}</span></div>
+      <div class="dia-lista">${items.map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo} ${editMov && editMov.id===g.id?'editando':''}" data-id="${g.id}" data-tipo="${g.tipo}" role="button" tabindex="0" aria-label="Modificar movimiento">
+        <span class="avatar" aria-hidden="true"></span>
+        <span class="info"><span class="concepto"></span><span class="meta"></span></span>
+        <span class="imp num">${g.tipo==='ingreso'?'+':'−'}${fmt(g.importe)}</span></div>`; }).join('')}</div></div>`;
+  }).join('') : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero más abajo.</p>';
 
   const minF = `${vista.y}-${pad(vista.m+1)}-01`, maxF = `${vista.y}-${pad(vista.m+1)}-${pad(nDias)}`;
   const fechaDef = esActual ? isoHoy : minF;
@@ -472,7 +489,7 @@ function render(){
   app.innerHTML = `
     <div class="hero">
       <p class="quedan">${queda>=0?'Te quedan':'Vas por encima'}</p>
-      <p class="cifra num ${queda<0?'negativo':''}">${fmt(Math.abs(queda))}</p>
+      <p class="cifra num ${queda<0?'negativo':''}">${fmtGrande(Math.abs(queda))}</p>
       <p class="de">de ${fmt(limEf)}${extra>0?` (${fmt(mes.limite)} + ${fmt(extra)} extra)`:''} · <button id="editar">editar</button></p>
       <div class="barra" role="img" aria-label="Gastado ${Math.round(pct)}% del límite">
         <div class="lleno" style="width:${pct}%;background:${color}"></div>
@@ -488,6 +505,12 @@ function render(){
       <button class="ajustar" id="ajustar">El banco me dice otra cantidad</button>
     </div>
 
+    <section>
+      <h2>Movimientos</h2>
+      ${fechas.length?'<p class="pista">Toca un movimiento para modificarlo o borrarlo.</p>':''}
+      ${listado}
+    </section>
+
     <section id="form-mov">
       ${editMov?'<p class="editando-aviso">Modificando un movimiento</p>':''}
       <div class="selector" role="tablist">
@@ -501,16 +524,9 @@ function render(){
         ${esIngreso?`<label class="ancho check"><input id="g-lim" type="checkbox"> <span>Sumarlo también a lo que puedo gastar este mes</span></label>`:''}
         <p class="error" id="g-err"></p>
         ${editMov ? `<button class="secundario-btn" id="g-cancel">Cancelar</button>
-        <button class="primario mitad ${esIngreso?'verde':''}" id="g-add">Guardar cambios</button>`
+        <button class="primario mitad ${esIngreso?'verde':''}" id="g-add">Guardar cambios</button>
+        <button class="peligro" id="g-del">Borrar este movimiento</button>`
         : `<button class="primario ${esIngreso?'verde':''}" id="g-add">${esIngreso?'Añadir ingreso':'Añadir gasto'}</button>`}
-      </div>
-    </section>
-
-    <section>
-      <h2>Pagos automáticos</h2>
-      <p class="copia-nota">Trae los pagos que tus atajos han ido apuntando (Apple Pay y capturas de compras en apps). Puedes importar el mismo archivo todas las veces que quieras: los pagos repetidos no se duplican.</p>
-      <div class="copia">
-        <label>Importar pagos<input type="file" id="importar-ap" accept=".txt,text/plain"></label>
       </div>
     </section>
 
@@ -542,14 +558,25 @@ function render(){
     </section>
 
     <section>
-      <h2>Movimientos</h2>
-      ${fechas.length?'<p class="pista">Toca un movimiento para modificarlo.</p>':''}
-      ${listado}
+      <h2>Pagos automáticos</h2>
+      <p class="copia-nota">Trae los pagos que tus atajos han ido apuntando (Apple Pay y capturas de compras en apps). Puedes importar el mismo archivo todas las veces que quieras: los pagos repetidos no se duplican.</p>
+      <div class="copia">
+        <label>Importar pagos<input type="file" id="importar-ap" accept=".txt,text/plain"></label>
+      </div>
     </section>`;
 
   // conceptos con textContent (evita inyectar HTML)
-  const conceptos = app.querySelectorAll('.gasto .concepto');
-  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':'') + (g.origen==='applepay'?' · Apple Pay':g.origen==='cartera'?' · Cartera':g.origen==='captura'?' · Compra en app':'') + (g.tarjeta?' · '+g.tarjeta:''); });
+  const filas = app.querySelectorAll('.gasto[data-id]');
+  orden.forEach((g,k)=>{
+    const fila = filas[k];
+    const concepto = g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto');
+    fila.querySelector('.concepto').textContent = concepto;
+    const hora = g.hora ? new Date(g.hora).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}) : '';
+    const origen = g.origen==='applepay'?'Apple Pay':g.origen==='cartera'?'Cartera':g.origen==='captura'?'Compra en app':(g.tipo==='ingreso'?'Ingreso':'Manual');
+    fila.querySelector('.meta').textContent = [hora, origen, g.tarjeta, g.alLimite?'suma al máximo':''].filter(Boolean).join(' · ');
+    const letra = (concepto.match(/[A-Za-zÁÉÍÓÚÑáéíóúñÜü0-9]/)||['·'])[0].toUpperCase();
+    fila.querySelector('.avatar').textContent = g.tipo==='ingreso' ? '+' : letra;
+  });
 
   app.querySelectorAll('.selector button').forEach(b=>b.onclick = ()=>{
     const imp = document.getElementById('g-imp').value, con = document.getElementById('g-con').value, fe = document.getElementById('g-fecha').value;
@@ -591,6 +618,14 @@ function render(){
     }catch(err){
       alert('No se pudo leer ese archivo.');
     }
+  };
+  const gd = document.getElementById('g-del');
+  if(gd) gd.onclick = async ()=>{
+    if(!confirm('¿Borrar este movimiento?')) return;
+    if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
+    else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
+    editMov = null;
+    render(); await guardar();
   };
   const gc = document.getElementById('g-cancel');
   if(gc) gc.onclick = ()=>{ editMov = null; render(); };

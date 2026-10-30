@@ -1,5 +1,5 @@
 // Cambia este número cada vez que subas una versión nueva de la app
-const VERSION = 'presupuesto-v3';
+const VERSION = 'presupuesto-v4';
 const ARCHIVOS = ['./', 'index.html', 'manifest.json', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
