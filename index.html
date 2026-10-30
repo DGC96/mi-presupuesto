@@ -649,8 +649,10 @@ function bloqueDiario(c){
       <p class="sub">Los gastos programados que cuentan en tu máximo ocupan todo el presupuesto del mes. Sube el máximo o márcalos como «aparte».</p></div>`;
   }
   if(!c.esActual){
-    return `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(c.base)} al día</p>
-      <p class="sub">durante los ${c.nDias} días del mes${c.progMax?` · ya descontados ${fmt(c.progMax)} de gastos programados`:''}</p></div>`;
+    // Mes que aún no ha empezado: lo que queda (ya restado lo apuntado) repartido entre todos sus días
+    const descontado = [c.total?`${fmt(c.total)} ya apuntados`:'', c.progMax?`${fmt(c.progMax)} de gastos programados`:''].filter(Boolean).join(' y ');
+    return `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(c.queda / c.nDias)} al día</p>
+      <p class="sub">durante los ${c.nDias} días del mes${descontado?` · descontados ${descontado}`:''}</p></div>`;
   }
   const d = hoy.getDate();
   const hucha = huchaDia(c, d);
