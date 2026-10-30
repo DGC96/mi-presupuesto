@@ -46,7 +46,7 @@ button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .mes{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.mes h1{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1.05rem;font-weight:600;margin:0;text-transform:capitalize}
+.mes h1{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1.05rem;font-weight:600;margin:0}
 .flecha{background:none;border:1px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:1.1rem;color:var(--muted)}
 
 .hero{padding:6px 0 22px}
@@ -94,7 +94,39 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .config p{color:var(--muted);margin:0 0 14px}
 .config .fila{display:flex;gap:10px}
 .config input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:1.4rem;font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif}
+.config .campo{display:flex;flex-direction:column;gap:6px;font-size:.9rem;color:var(--muted);margin-bottom:14px}
+.config .campo input{flex:none;width:100%}
+.config .fila button{flex:1;padding:14px 20px}
+.config .secundario{background:var(--surface);color:var(--accent);border:1px solid var(--line)}
+.banco{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.banco > div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.banco .etq{font-size:.82rem;color:var(--muted);margin:0;line-height:1.3}
+.banco .valor{font-size:1.25rem;font-weight:600;margin:4px 0 0}
+.banco .valor.negativo{color:var(--bad)}
+.ajustar{background:none;border:none;color:var(--accent);padding:10px 0 0;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
 .config button{background:var(--accent);color:var(--surface);border:none;border-radius:10px;padding:0 20px;font-weight:600}
+.selector{display:inline-flex;background:var(--track);border-radius:10px;padding:3px;margin-bottom:14px}
+.selector button{border:none;background:none;padding:8px 18px;border-radius:8px;font-weight:600;color:var(--muted)}
+.selector button.activo{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.form .check{flex-direction:row;align-items:center;gap:10px;font-size:.92rem;color:var(--ink)}
+.form .check input{width:22px;height:22px;flex:none;accent-color:var(--good)}
+.primario.verde{background:var(--good)}
+.gasto.ingreso .imp{color:var(--good)}
+.nota-ingresos{font-size:.88rem;color:var(--muted);margin:10px 0 0}
+.cab-seccion{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cab-seccion h2{margin-bottom:4px}
+.total-fijos{font-weight:600}
+.fijo{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.fijo-dia{width:40px;height:40px;flex:none;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:600}
+.fijo.hecho .fijo-dia{background:var(--goodsoft);border-color:transparent;color:var(--good)}
+.fijo-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.fijo-nombre{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fijo-sub{font-size:.82rem;color:var(--muted)}
+.fijo.hecho .imp{color:var(--muted)}
+.fijo .imp{font-weight:600}
+.fijo-form{margin-top:14px}
+.secundario-btn{background:var(--surface);color:var(--accent);border:1px solid var(--line);border-radius:10px;padding:14px;font-weight:600}
+.primario.mitad{grid-column:auto}
 .copia{display:flex;gap:10px;flex-wrap:wrap}
 .copia button,.copia label{flex:1;min-width:140px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-weight:600;color:var(--accent);cursor:pointer}
 .copia input{display:none}
@@ -128,15 +160,55 @@ const fmt = n => eur.format(n);
 const hoy = new Date();
 const pad = n => String(n).padStart(2,'0');
 const isoHoy = `${hoy.getFullYear()}-${pad(hoy.getMonth()+1)}-${pad(hoy.getDate())}`;
-let vista = {y:hoy.getFullYear(), m:hoy.getMonth()}; // m 0-11
+const INICIO = {y:2026, m:10}; // noviembre 2026 (m 0-11)
+let vista = {y:hoy.getFullYear(), m:hoy.getMonth()};
+if(vista.y*12+vista.m < INICIO.y*12+INICIO.m) vista = {...INICIO};
 let estado = {meses:{}};
 let editandoLimite = false;
 const LS_KEY = 'presupuesto-v1';
 
 const claveMes = (y,m) => `${y}-${pad(m+1)}`;
 const diasEnMes = (y,m) => new Date(y,m+1,0).getDate();
-const nombreMes = (y,m) => new Date(y,m,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+const nombreMes = (y,m) => { const t = new Date(y,m,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'}); return t.charAt(0).toUpperCase()+t.slice(1); };
 const mesActual = () => estado.meses[claveMes(vista.y,vista.m)];
+
+const num = v => { const n = parseFloat(String(v).replace(/\s/g,'').replace(',','.')); return isNaN(n) ? NaN : Math.round(n*100)/100; };
+const totalGastos = mes => mes.gastos.reduce((s,g)=>s+g.importe,0);
+const totalIngresos = mes => (mes.ingresos||[]).reduce((s,g)=>s+g.importe,0);
+const extraLimite = mes => (mes.ingresos||[]).filter(g=>g.alLimite).reduce((s,g)=>s+g.importe,0);
+const nuevoId = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let tipoMov = 'gasto';
+let fijoFormAbierto = false;
+
+// ---- Pagos fijos (letras, cuotas, recibos) ----
+const idxMes = k => { const [y,m] = k.split('-').map(Number); return y*12 + (m-1); };
+function fijosDelMes(k){
+  const [y,m] = k.split('-').map(Number);
+  const nDias = diasEnMes(y, m-1);
+  return (estado.fijos||[]).filter(f=>{
+    const n = idxMes(k) - idxMes(f.desde);
+    if(n < 0) return false;
+    if(f.cuotas && n >= f.cuotas) return false;
+    if(f.hasta && idxMes(k) > idxMes(f.hasta)) return false;
+    return true;
+  }).map(f=>{
+    const n = idxMes(k) - idxMes(f.desde);
+    const dia = Math.min(f.dia, nDias);
+    return {...f, diaReal: dia, fecha: `${k}-${pad(dia)}`, numCuota: n+1};
+  }).sort((a,b)=>a.diaReal-b.diaReal);
+}
+// ¿Ya se ha cobrado a día de hoy?
+const cobrado = f => f.fecha <= isoHoy;
+const sumaFijos = k => fijosDelMes(k).reduce((s,f)=>s+f.importe,0);
+const sumaFijosCobrados = k => fijosDelMes(k).filter(cobrado).reduce((s,f)=>s+f.importe,0);
+
+function saldoSugerido(){
+  // saldo final estimado del mes anterior
+  const prev = new Date(vista.y, vista.m-1, 1);
+  const mp = estado.meses[claveMes(prev.getFullYear(), prev.getMonth())];
+  if(mp && typeof mp.saldoInicial==='number') return Math.round((mp.saldoInicial + totalIngresos(mp) - totalGastos(mp) - sumaFijos(claveMes(prev.getFullYear(), prev.getMonth())))*100)/100;
+  return '';
+}
 
 function limiteSugerido(){
   // usa el límite del mes anterior más reciente como sugerencia
@@ -155,46 +227,72 @@ async function guardar(){
 
 function render(){
   document.getElementById('titulo-mes').textContent = nombreMes(vista.y,vista.m);
+  document.getElementById('prev').style.visibility = (vista.y*12+vista.m <= INICIO.y*12+INICIO.m) ? 'hidden' : 'visible';
   const app = document.getElementById('app');
   const mes = mesActual();
 
-  if(!mes || !mes.limite || editandoLimite){
-    const valor = mes?.limite || limiteSugerido();
+  if(!mes || !mes.limite || typeof mes.saldoInicial!=='number' || editandoLimite){
+    const gastado = mes ? totalGastos(mes) : 0;
+    const ingresado = mes ? totalIngresos(mes) : 0;
+    const saldoVal = (mes && typeof mes.saldoInicial==='number') ? Math.round((mes.saldoInicial+ingresado-gastado-sumaFijosCobrados(claveMes(vista.y,vista.m)))*100)/100 : saldoSugerido();
+    const limVal = mes?.limite || limiteSugerido();
     app.innerHTML = `
       <div class="config">
-        <h2>¿Cuánto puedes gastar este mes?</h2>
-        <p>Pon tu tope y ve apuntando lo que gastas. Te diré cada día cuánto te queda.</p>
+        <h2>Prepara ${nombreMes(vista.y,vista.m).toLowerCase()}</h2>
+        <p>${(gastado>0||ingresado>0) ? 'Pon lo que te aparece ahora mismo en el banco.' : 'Pon el dinero que tienes en el banco y cuánto quieres gastar como máximo este mes.'}</p>
+        <label class="campo">Dinero en el banco${(gastado>0||ingresado>0)?' ahora':''} (€)
+          <input id="saldo" class="num" type="text" inputmode="decimal" placeholder="1.200" value="${saldoVal}">
+        </label>
+        <label class="campo">Máximo que quiero gastar este mes (€)
+          <input id="lim" class="num" type="text" inputmode="decimal" placeholder="500" value="${limVal}">
+        </label>
+        <p class="error" id="cfg-err"></p>
         <div class="fila">
-          <input id="lim" class="num" type="number" inputmode="decimal" min="1" step="1" placeholder="500" value="${valor}" aria-label="Límite mensual en euros">
+          ${mes && mes.limite && typeof mes.saldoInicial==='number' ? '<button id="cancelar" class="secundario">Cancelar</button>' : ''}
           <button id="guardar-lim">Guardar</button>
         </div>
       </div>`;
-    const inp = document.getElementById('lim');
     const ok = async ()=>{
-      const v = parseFloat(String(inp.value).replace(',','.'));
-      if(!(v>0)){ inp.focus(); return; }
+      const saldo = num(document.getElementById('saldo').value);
+      const lim = num(document.getElementById('lim').value);
+      const err = document.getElementById('cfg-err');
+      if(isNaN(saldo)){ err.textContent = 'Escribe el dinero que tienes en el banco.'; return; }
+      if(!(lim>0)){ err.textContent = 'Escribe un máximo de gasto mayor que cero.'; return; }
       const k = claveMes(vista.y,vista.m);
       estado.meses[k] = estado.meses[k] || {gastos:[]};
-      estado.meses[k].limite = Math.round(v*100)/100;
+      estado.meses[k].limite = lim;
+      // guardamos el saldo del inicio del mes: lo de ahora + lo ya gastado
+      estado.meses[k].saldoInicial = Math.round((saldo + totalGastos(estado.meses[k]) - totalIngresos(estado.meses[k]) + sumaFijosCobrados(k))*100)/100;
       editandoLimite = false;
       render(); await guardar();
     };
     document.getElementById('guardar-lim').onclick = ok;
-    inp.onkeydown = e=>{ if(e.key==='Enter') ok(); };
+    const c = document.getElementById('cancelar'); if(c) c.onclick = ()=>{ editandoLimite=false; render(); };
+    ['saldo','lim'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') ok(); });
     return;
   }
 
-  const total = mes.gastos.reduce((s,g)=>s+g.importe,0);
-  const queda = mes.limite - total;
+  if(!mes.ingresos) mes.ingresos = [];
+  const total = totalGastos(mes);
+  const ingresos = totalIngresos(mes);
+  const extra = extraLimite(mes);
+  const limEf = mes.limite + extra;
+  const queda = limEf - total;
+  const kMes = claveMes(vista.y,vista.m);
+  const fijos = fijosDelMes(kMes);
+  const fijosTotal = sumaFijos(kMes);
+  const fijosCobr = sumaFijosCobrados(kMes);
+  const saldoActual = mes.saldoInicial + ingresos - total - fijosCobr;
+  const saldoFinalPrevisto = mes.saldoInicial + ingresos - Math.max(total, limEf) - fijosTotal;
   const nDias = diasEnMes(vista.y,vista.m);
   const esActual = vista.y===hoy.getFullYear() && vista.m===hoy.getMonth();
   const esPasado = new Date(vista.y,vista.m+1,1) <= new Date(hoy.getFullYear(),hoy.getMonth(),1);
   const diaHoy = esActual ? hoy.getDate() : (esPasado ? nDias : 0);
   const diasRestantes = esActual ? nDias - hoy.getDate() + 1 : (esPasado ? 0 : nDias);
-  const pct = Math.min(100, Math.max(0, total/mes.limite*100));
+  const pct = Math.min(100, Math.max(0, total/limEf*100));
   const ritmoPct = diaHoy/nDias*100;
   const gastadoHoy = mes.gastos.filter(g=>g.fecha===isoHoy).reduce((s,g)=>s+g.importe,0);
-  const color = total>mes.limite ? 'var(--bad)' : (pct>ritmoPct+5 ? 'var(--warn)' : 'var(--good)');
+  const color = total>limEf ? 'var(--bad)' : (pct>ritmoPct+5 ? 'var(--warn)' : 'var(--good)');
 
   let diario;
   if(esPasado && !esActual){
@@ -204,54 +302,89 @@ function render(){
   } else if(queda<0){
     diario = `<div class="diario mal"><p class="grande num">Te has pasado ${fmt(-queda)}</p><p class="sub">Intenta no gastar más hasta que acabe el mes.</p></div>`;
   } else {
-    const porDia = queda/diasRestantes;
-    diario = `<div class="diario"><p class="grande num">${fmt(porDia)} al día</p>
+    const porDiaPerm = queda/diasRestantes;
+    diario = `<div class="diario"><p class="grande num">${fmt(porDiaPerm)} al día</p>
       <p class="sub">es lo que puedes gastar durante ${diasRestantes===1?'el último día':`los ${diasRestantes} días que quedan`}${esActual?` · hoy llevas ${fmt(gastadoHoy)}`:''}</p></div>`;
   }
 
-  // agrupar por día
+  // agrupar movimientos por día
+  const movs = [...mes.gastos.map(g=>({...g,tipo:'gasto'})), ...mes.ingresos.map(g=>({...g,tipo:'ingreso'}))];
   const porDia = {};
-  mes.gastos.forEach(g=>{ (porDia[g.fecha] = porDia[g.fecha] || []).push(g); });
+  movs.forEach(g=>{ (porDia[g.fecha] = porDia[g.fecha] || []).push(g); });
   const fechas = Object.keys(porDia).sort().reverse();
+  const orden = [];
   const listado = fechas.length ? fechas.map(f=>{
     const d = new Date(f+'T12:00:00');
     const etiqueta = f===isoHoy ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'});
-    const sum = porDia[f].reduce((s,g)=>s+g.importe,0);
-    return `<div class="dia"><div class="dia-cab"><span style="text-transform:capitalize">${etiqueta}</span><span class="num">${fmt(sum)}</span></div>
-      ${porDia[f].map(g=>`<div class="gasto"><span class="concepto"></span><span class="imp num">${fmt(g.importe)}</span>
-      <button class="borrar" data-id="${g.id}" aria-label="Borrar gasto">×</button></div>`).join('')}</div>`;
-  }).join('') : '<p class="vacio">Aún no has apuntado ningún gasto este mes. Empieza con el primero arriba.</p>';
+    const gastoDia = porDia[f].filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
+    return `<div class="dia"><div class="dia-cab"><span style="text-transform:capitalize">${etiqueta}</span><span class="num">${gastoDia>0?'Gastado '+fmt(gastoDia):''}</span></div>
+      ${porDia[f].map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo}"><span class="concepto"></span><span class="imp num">${g.tipo==='ingreso'?'+':''}${fmt(g.importe)}</span>
+      <button class="borrar" data-id="${g.id}" data-tipo="${g.tipo}" aria-label="Borrar ${g.tipo}">×</button></div>`; }).join('')}</div>`;
+  }).join('') : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero arriba.</p>';
 
   const minF = `${vista.y}-${pad(vista.m+1)}-01`, maxF = `${vista.y}-${pad(vista.m+1)}-${pad(nDias)}`;
   const fechaDef = esActual ? isoHoy : minF;
+  const esIngreso = tipoMov==='ingreso';
 
   app.innerHTML = `
     <div class="hero">
       <p class="quedan">${queda>=0?'Te quedan':'Vas por encima'}</p>
       <p class="cifra num ${queda<0?'negativo':''}">${fmt(Math.abs(queda))}</p>
-      <p class="de">de ${fmt(mes.limite)} · <button id="editar">cambiar límite</button></p>
+      <p class="de">de ${fmt(limEf)}${extra>0?` (${fmt(mes.limite)} + ${fmt(extra)} extra)`:''} · <button id="editar">editar</button></p>
       <div class="barra" role="img" aria-label="Gastado ${Math.round(pct)}% del límite">
         <div class="lleno" style="width:${pct}%;background:${color}"></div>
         ${esActual?`<div class="ritmo" style="left:${ritmoPct}%" title="Dónde deberías ir hoy"></div>`:''}
       </div>
       <div class="leyenda"><span>Gastado ${fmt(total)}</span>${esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>
       ${diario}
+      <div class="banco">
+        <div><p class="etq">En el banco</p><p class="valor num ${saldoActual<0?'negativo':''}">${fmt(saldoActual)}</p></div>
+        <div><p class="etq">${esPasado && !esActual ? 'Al cerrar el mes' : 'Si cumples tu máximo, acabarás con'}</p><p class="valor num">${fmt(esPasado && !esActual ? saldoActual : saldoFinalPrevisto)}</p></div>
+      </div>
+      ${(ingresos>0 || fijosTotal-fijosCobr>0)?`<p class="nota-ingresos">${[ingresos>0?`Este mes han entrado ${fmt(ingresos)}.`:'', fijosTotal-fijosCobr>0?`Quedan ${fmt(fijosTotal-fijosCobr)} de pagos fijos por cobrar.`:''].filter(Boolean).join(' ')}</p>`:''}
+      <button class="ajustar" id="ajustar">El banco me dice otra cantidad</button>
     </div>
 
     <section>
-      <h2>Apuntar un gasto</h2>
+      <div class="selector" role="tablist">
+        <button role="tab" aria-selected="${!esIngreso}" data-tipo="gasto" class="${!esIngreso?'activo':''}">Gasto</button>
+        <button role="tab" aria-selected="${esIngreso}" data-tipo="ingreso" class="${esIngreso?'activo':''}">Ingreso</button>
+      </div>
       <div class="form">
-        <label>Importe (€)<input id="g-imp" class="importe" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0,00"></label>
+        <label>Importe (€)<input id="g-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00"></label>
         <label>Fecha<input id="g-fecha" type="date" value="${fechaDef}" min="${minF}" max="${maxF}"></label>
-        <label class="ancho">Concepto<input id="g-con" type="text" maxlength="60" placeholder="Supermercado, cena, gasolina…"></label>
+        <label class="ancho">Concepto<input id="g-con" type="text" maxlength="60" placeholder="${esIngreso?'Nómina, bizum, devolución…':'Supermercado, cena, gasolina…'}"></label>
+        ${esIngreso?`<label class="ancho check"><input id="g-lim" type="checkbox"> <span>Sumarlo también a lo que puedo gastar este mes</span></label>`:''}
         <p class="error" id="g-err"></p>
-        <button class="primario" id="g-add">Añadir gasto</button>
+        <button class="primario ${esIngreso?'verde':''}" id="g-add">${esIngreso?'Añadir ingreso':'Añadir gasto'}</button>
       </div>
     </section>
 
     <section>
+      <div class="cab-seccion"><h2>Pagos fijos de este mes</h2>${fijos.length?`<span class="num total-fijos">${fmt(fijosTotal)}</span>`:''}</div>
+      <p class="copia-nota">Se descuentan de tu dinero en el banco, pero no de lo que puedes gastar al día.</p>
+      ${fijos.length ? fijos.map(f=>`<div class="fijo ${cobrado(f)?'hecho':''}">
+          <div class="fijo-dia num"><span>${f.diaReal}</span></div>
+          <div class="fijo-info"><span class="fijo-nombre"></span><span class="fijo-sub">${cobrado(f)?'Cobrado':'Pendiente'}${f.cuotas===1?' · pago único':f.cuotas?` · cuota ${f.numCuota} de ${f.cuotas}`:' · todos los meses'}</span></div>
+          <span class="imp num">${fmt(f.importe)}</span>
+          <button class="borrar quitar-fijo" data-id="${f.id}" aria-label="Quitar pago fijo">×</button>
+        </div>`).join('') : '<p class="vacio">No tienes pagos fijos este mes.</p>'}
+      ${fijoFormAbierto ? `<div class="form fijo-form">
+          <label class="ancho">Nombre<input id="f-nom" type="text" maxlength="40" placeholder="Letra del coche, gimnasio…"></label>
+          <label>Importe (€)<input id="f-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00"></label>
+          <label>Día de cobro<input id="f-dia" type="text" inputmode="numeric" placeholder="3"></label>
+          <label class="ancho">Número de cuotas (vacío si es todos los meses)<input id="f-cuo" type="text" inputmode="numeric" placeholder="Todos los meses"></label>
+          <p class="error" id="f-err"></p>
+          <button class="secundario-btn" id="f-cancel">Cancelar</button>
+          <button class="primario mitad" id="f-add">Guardar pago fijo</button>
+        </div>
+        <p class="copia-nota">Empezará a cobrarse en ${nombreMes(vista.y,vista.m).toLowerCase()}.</p>`
+        : `<button class="ajustar" id="f-abrir">Añadir un pago fijo</button>`}
+    </section>
+
+    <section>
       <h2>Gasto por día</h2>
-      <div class="grafico">${grafico(mes, nDias, diasRestantes, queda)}</div>
+      <div class="grafico">${grafico(mes, nDias, limEf)}</div>
     </section>
 
     <section>
@@ -260,32 +393,84 @@ function render(){
     </section>`;
 
   // conceptos con textContent (evita inyectar HTML)
-  let i=0; const conceptos = app.querySelectorAll('.gasto .concepto');
-  fechas.forEach(f=>porDia[f].forEach(g=>{ conceptos[i++].textContent = g.concepto || 'Sin concepto'; }));
+  const conceptos = app.querySelectorAll('.gasto .concepto');
+  orden.forEach((g,k)=>{ conceptos[k].textContent = (g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto')) + (g.alLimite?' · suma al máximo':''); });
 
+  app.querySelectorAll('.selector button').forEach(b=>b.onclick = ()=>{
+    const imp = document.getElementById('g-imp').value, con = document.getElementById('g-con').value, fe = document.getElementById('g-fecha').value;
+    tipoMov = b.dataset.tipo; render();
+    document.getElementById('g-imp').value = imp; document.getElementById('g-con').value = con; document.getElementById('g-fecha').value = fe;
+  });
   document.getElementById('editar').onclick = ()=>{ editandoLimite = true; render(); };
+  document.getElementById('ajustar').onclick = async ()=>{
+    const r = prompt('¿Cuánto te aparece ahora en el banco? (€)', String(Math.round(saldoActual*100)/100).replace('.',','));
+    if(r===null) return;
+    const v = num(r);
+    if(isNaN(v)){ alert('Escribe solo la cantidad, por ejemplo 1234,56'); return; }
+    mes.saldoInicial = Math.round((v + total - ingresos + fijosCobr)*100)/100;
+    render(); await guardar();
+  };
   const add = async ()=>{
-    const imp = parseFloat(String(document.getElementById('g-imp').value).replace(',','.'));
+    const imp = num(document.getElementById('g-imp').value);
     const fecha = document.getElementById('g-fecha').value;
     const err = document.getElementById('g-err');
     if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
     if(!fecha || fecha<minF || fecha>maxF){ err.textContent = 'Elige una fecha de este mes.'; return; }
-    mes.gastos.push({id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), importe: Math.round(imp*100)/100, concepto: document.getElementById('g-con').value.trim(), fecha});
+    const mov = {id: nuevoId(), importe: imp, concepto: document.getElementById('g-con').value.trim(), fecha};
+    if(tipoMov==='ingreso'){ mov.alLimite = document.getElementById('g-lim').checked; mes.ingresos.push(mov); }
+    else mes.gastos.push(mov);
     render(); await guardar();
     document.getElementById('g-imp').focus();
   };
   document.getElementById('g-add').onclick = add;
   ['g-imp','g-con'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') add(); });
-  app.querySelectorAll('.borrar').forEach(b=>b.onclick = async ()=>{
-    mes.gastos = mes.gastos.filter(g=>g.id!==b.dataset.id);
+  // nombres de pagos fijos con textContent
+  app.querySelectorAll('.fijo-nombre').forEach((el,k)=>{ el.textContent = fijos[k].nombre; });
+  const abrir = document.getElementById('f-abrir');
+  if(abrir) abrir.onclick = ()=>{ fijoFormAbierto = true; render(); document.getElementById('f-nom').focus(); };
+  const cancelar = document.getElementById('f-cancel');
+  if(cancelar) cancelar.onclick = ()=>{ fijoFormAbierto = false; render(); };
+  const fAdd = document.getElementById('f-add');
+  if(fAdd) fAdd.onclick = async ()=>{
+    const nombre = document.getElementById('f-nom').value.trim();
+    const imp = num(document.getElementById('f-imp').value);
+    const dia = parseInt(document.getElementById('f-dia').value,10);
+    const cuoTxt = document.getElementById('f-cuo').value.trim();
+    const cuotas = cuoTxt ? parseInt(cuoTxt,10) : null;
+    const err = document.getElementById('f-err');
+    if(!nombre){ err.textContent = 'Ponle un nombre al pago.'; return; }
+    if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
+    if(!(dia>=1 && dia<=31)){ err.textContent = 'El día de cobro tiene que estar entre 1 y 31.'; return; }
+    if(cuoTxt && !(cuotas>=1)){ err.textContent = 'El número de cuotas tiene que ser 1 o más, o déjalo vacío.'; return; }
+    estado.fijos = estado.fijos || [];
+    estado.fijos.push({id: nuevoId(), nombre, importe: imp, dia, desde: kMes, cuotas});
+    fijoFormAbierto = false;
+    render(); await guardar();
+  };
+  app.querySelectorAll('.quitar-fijo').forEach(b=>b.onclick = async ()=>{
+    const f = estado.fijos.find(x=>x.id===b.dataset.id);
+    if(!f) return;
+    if(idxMes(f.desde) >= idxMes(kMes)){
+      if(!confirm(`¿Quitar «${f.nombre}»? Se borrará por completo.`)) return;
+      estado.fijos = estado.fijos.filter(x=>x.id!==f.id);
+    } else {
+      if(!confirm(`¿Dejar de contar «${f.nombre}» desde ${nombreMes(vista.y,vista.m).toLowerCase()}? Los meses anteriores no cambian.`)) return;
+      const prev = new Date(vista.y, vista.m-1, 1);
+      f.hasta = claveMes(prev.getFullYear(), prev.getMonth());
+    }
+    render(); await guardar();
+  });
+  app.querySelectorAll('.borrar:not(.quitar-fijo)').forEach(b=>b.onclick = async ()=>{
+    if(b.dataset.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==b.dataset.id);
+    else mes.gastos = mes.gastos.filter(g=>g.id!==b.dataset.id);
     render(); await guardar();
   });
 }
 
-function grafico(mes, nDias, diasRestantes, queda){
+function grafico(mes, nDias, limEf){
   const sumas = Array(nDias).fill(0);
   mes.gastos.forEach(g=>{ const d = parseInt(g.fecha.slice(8,10),10); if(d>=1&&d<=nDias) sumas[d-1]+=g.importe; });
-  const media = mes.limite/nDias;
+  const media = limEf/nDias;
   const max = Math.max(media*1.6, ...sumas);
   const W=360, H=140, top=10, base=H-22, bw=W/nDias;
   const y = v => base - (v/max)*(base-top);
@@ -307,12 +492,23 @@ function grafico(mes, nDias, diasRestantes, queda){
   </svg>`;
 }
 
-document.getElementById('prev').onclick = ()=>{ vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; render(); };
+document.getElementById('prev').onclick = ()=>{
+  if(vista.y*12+vista.m <= INICIO.y*12+INICIO.m) return;
+  vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; render();
+};
 document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; render(); };
 
 // Arranque: primero copia local, luego base de datos privada si está disponible
 try{ const raw = localStorage.getItem(LS_KEY); if(raw) estado = JSON.parse(raw); }catch(e){}
 if(!estado.meses) estado = {meses:{}};
+if(!estado.fijos){
+  estado.fijos = [
+    {id:'coche', nombre:'Letra del coche', importe:325.76, dia:3, desde:'2026-11', cuotas:null},
+    {id:'pc', nombre:'PC nuevo', importe:354.25, dia:3, desde:'2026-11', cuotas:9},
+    {id:'ipad', nombre:'iPad (última cuota)', importe:175, dia:26, desde:'2026-11', cuotas:1}
+  ];
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(estado)); }catch(e){}
+}
 render();
 
 // Pedir almacenamiento persistente para que iOS no borre los datos
