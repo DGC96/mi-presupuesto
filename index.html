@@ -37,11 +37,12 @@
   --accent:#8DB8E0; --track:#24313E;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;font-size:16px;line-height:1.5}
 main{max-width:520px;margin:0 auto;padding:16px max(18px,env(safe-area-inset-right,0px)) 48px max(18px,env(safe-area-inset-left,0px))}
 .num{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-variant-numeric:tabular-nums}
-button,input{font:inherit;color:inherit}
+button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
@@ -150,6 +151,57 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
 .copia input{display:none}
 .copia-nota{font-size:.85rem;color:var(--muted);margin:0 0 12px}
 .aviso{font-size:.8rem;color:var(--muted);margin-top:36px;text-align:center}
+/* v5 */
+.barra{overflow:hidden}
+.barra .lleno{position:absolute;top:0;bottom:0;border-radius:0 9px 9px 0}
+.barra .reservado{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(135deg,var(--muted) 0 4px,transparent 4px 8px);opacity:.55}
+.barra .ritmo{top:0;bottom:0;width:3px;opacity:.7}
+.muestra{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:repeating-linear-gradient(135deg,var(--muted) 0 2px,transparent 2px 4px)}
+.acciones-hero{display:flex;flex-wrap:wrap;gap:0 18px}
+.aviso-copia{background:var(--surface);border:1px solid var(--warn);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+.aviso-copia p{margin:0;font-size:.9rem}
+.aviso-copia button{align-self:flex-start;background:var(--warn);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:600}
+.recomendado{margin:-4px 0 16px}
+.rec{background:var(--goodsoft);border-radius:14px;padding:14px 16px}
+.rec.mal{background:var(--badsoft)}
+.config .rec p{margin:0;color:var(--ink)}
+.rec .rec-etq{font-size:.85rem;color:var(--muted) !important}
+.rec .rec-cifra{font-size:1.9rem;font-weight:800;letter-spacing:-.02em}
+.rec-desglose{margin:8px 0 4px;font-size:.85rem;color:var(--muted)}
+.rec-desglose div{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+.config .rec .rec-nota{font-size:.85rem;color:var(--muted);margin-top:6px}
+.config .usar-rec{margin-top:10px;padding:10px 16px}
+.res-tabla{margin-top:10px;border-top:1px solid rgba(127,127,127,.25)}
+.res-fila{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(127,127,127,.25);font-size:.9rem}
+.res-fila span:first-child{color:var(--muted)}
+.res-fila span:last-child{text-align:right;font-weight:600}
+.txt-bien{color:var(--good)} .txt-mal{color:var(--bad)}
+.diario.resumen .grande{font-size:1.6rem}
+.filtros{display:flex;gap:8px;margin-bottom:12px}
+.filtros input,.filtros select,.form select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;color:var(--ink);min-width:0}
+.filtros input{flex:1}
+.filtros select{flex:0 1 46%}
+.form select{width:100%;padding:12px}
+.enlace{background:none;border:none;padding:0;color:var(--accent);text-decoration:underline;font:inherit}
+.subtitulo{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 2px}
+.fijo[data-fid],.fijo[data-pid]{cursor:pointer;border-radius:8px}
+.fijo[data-fid]:active,.fijo[data-pid]:active{background:var(--track)}
+.fijo.editando{background:var(--track);box-shadow:inset 4px 0 0 var(--accent);padding-left:8px}
+.fijo.ingreso .imp{color:var(--good)}
+.fijo.ingreso .fijo-dia{color:var(--good)}
+.gasto .avatar{font-size:1.25rem}
+.etq-credito{display:inline-block;align-self:flex-start;margin-top:4px;font-size:.75rem;font-weight:600;color:var(--accent);background:var(--track);border-radius:6px;padding:2px 7px}
+.gasto .imp.credito,.fijo.con-credito .imp{color:var(--muted)}
+.cats{display:flex;flex-direction:column;gap:6px}
+.cat-fila{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:left;width:100%}
+.cat-emoji{font-size:1.4rem;width:32px;text-align:center;flex:none}
+.cat-cuerpo{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.cat-cab{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.cat-nombre{font-weight:600}
+.cat-imp{font-weight:800;font-size:1.05rem;white-space:nowrap}
+.cat-barra{height:6px;background:var(--track);border-radius:3px;overflow:hidden}
+.cat-barra span{display:block;height:100%;background:var(--accent);border-radius:3px}
+.cat-pct{font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.barra .lleno{transition:none}}
 </style>
 </head>
@@ -163,10 +215,18 @@ h2{font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;font-size:1re
   <div id="app"><p class="vacio">Cargando…</p></div>
   <section>
     <h2>Copia de seguridad</h2>
-    <p class="copia-nota">Tus datos se guardan solo en este iPhone. Haz una copia de vez en cuando y guárdala en Archivos o iCloud Drive.</p>
+    <p class="copia-nota">Tus datos se guardan solo en este iPhone. Haz una copia de vez en cuando y guárdala en Archivos o iCloud Drive. <span id="ultima-copia"></span></p>
     <div class="copia">
       <button id="exportar">Guardar copia</button>
       <label>Restaurar copia<input type="file" id="importar" accept="application/json,.json"></label>
+    </div>
+  </section>
+  <section>
+    <h2>Exportar a Excel</h2>
+    <p class="copia-nota">Descarga tus movimientos, pagos fijos y gastos programados en un archivo que se abre con Excel o Numbers.</p>
+    <div class="copia">
+      <button id="csv-mes">Este mes</button>
+      <button id="csv-todo">Todos los meses</button>
     </div>
   </section>
   <p class="aviso" id="aviso"></p>
@@ -298,6 +358,9 @@ function importarApplePay(texto){
     // Las líneas del atajo de notificaciones de Cartera terminan en ;#N
     const esNotif = partes.length >= 3 && partes[partes.length-1].trim() === '#N';
     if(esNotif) partes = partes.slice(0,-1);
+    // El atajo de Apple Pay puede añadir la tarjeta al final: ;#T:CREDITO SANTANDER
+    let tarjetaAP = '';
+    if(partes.length >= 3 && /^#T:/i.test(partes[partes.length-1].trim())){ tarjetaAP = partes[partes.length-1].trim().slice(3).trim(); partes = partes.slice(0,-1); }
     if(partes.length < 2){ if(!esNotif) malos++; return; }
     const fecha = ajustarFecha(parseFecha(partes[0]));
     const importe = parseImporte(partes[1]);
@@ -328,6 +391,7 @@ function importarApplePay(texto){
       if(repetido){ duplicados++; return; }
     }
     const mov = {id: nuevoId(), importe: Math.abs(importe), concepto: comercio || (esNotif?'Compra sin detalle (toca para ponerle nombre)':'Apple Pay'), fecha, origen, hora};
+    if(tarjetaAP) mov.tarjeta = tarjetaAP;
     if(importe < 0){ mov.concepto = 'Devolución ' + (comercio||''); mov.alLimite = true; mesK.ingresos.push(mov); }
     else mesK.gastos.push(mov);
     nuevos++;
@@ -336,9 +400,54 @@ function importarApplePay(texto){
   return {nuevos, ignorados, malos, duplicados};
 }
 
-let editMov = null; // {id, tipo} del movimiento que se está modificando
+// =====================================================================
+//  v5 · Lógica principal
+// =====================================================================
+let editMov = null;      // {id, tipo} del movimiento que se está modificando
+let fijoEdit = null;     // null | 'nuevo' | id del fijo que se está modificando
+let fijoTipo = 'gasto';  // tipo del fijo en el formulario
+let progEdit = null;     // null | 'nuevo' | id del gasto programado
+let filtro = {q:'', tipo:'todos'};
+const DIA_MS = 24*60*60*1000;
 
-// ---- Pagos fijos (letras, cuotas, recibos) ----
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r2 = n => Math.round(n*100)/100;
+const suma = arr => arr.reduce((s,x)=>s+x.importe,0);
+const fmtFecha = f => { const d = new Date(f+'T12:00:00'); return d.toLocaleDateString('es-ES',{day:'numeric',month:'long'}); };
+
+// ---- Categorías ----
+const CATS = [
+  {id:'super',   n:'Supermercado',         e:'🛒'},
+  {id:'rest',    n:'Bares y restaurantes', e:'☕'},
+  {id:'trans',   n:'Transporte',           e:'⛽'},
+  {id:'ocio',    n:'Ocio',                 e:'🎬'},
+  {id:'compras', n:'Compras',              e:'🛍️'},
+  {id:'apps',    n:'Compras en apps',      e:'🎮'},
+  {id:'salud',   n:'Salud',                e:'💊'},
+  {id:'hogar',   n:'Hogar',                e:'🏠'},
+  {id:'otros',   n:'Otros',                e:'📦'}
+];
+const catInfo = id => CATS.find(c=>c.id===id) || CATS[CATS.length-1];
+const REGLAS = [
+  [/mercadona|carrefour|lidl|\bdia\b|aldi|eroski|alcampo|hipercor|consum|ahorram|supermerc|coviran|covirán|supercor|spar\b|froiz|gadis|bm\b|masymas|super\b/i, 'super'],
+  [/bar\b|caf[eé]|restaur|burger|mcdonald|telepizza|kfc|starbucks|glovo|just ?eat|uber ?eats|pizza|tapas|cerveza|taberna|bocadill|desayuno|comida|cena/i, 'rest'],
+  [/gasolin|repsol|cepsa|\bbp\b|galp|shell|petronor|parking|aparcam|renfe|metro|taxi|uber|cabify|bolt|autob|bus\b|peaje|itv|taller/i, 'trans'],
+  [/cine|netflix|spotify|hbo|disney|prime video|steam|playstation|nintendo|xbox|concierto|teatro|entradas|ticketmaster|museo|gimnasio|gym/i, 'ocio'],
+  [/farmacia|cl[ií]nica|dentista|m[eé]dico|hospital|óptica|optica|parafarm/i, 'salud'],
+  [/amazon|zara|primark|zapatill|ropa|libro|calzado|corte ingl|mediamarkt|fnac|pccomponentes|decathlon|aliexpress|shein|h&m|pull|bershka|mango|apple store/i, 'compras'],
+  [/ikea|leroy|bricomart|bricodepot|ferreter|luz|agua|butano|limpieza/i, 'hogar']
+];
+function adivinarCat(g){
+  if(g.origen==='captura') return 'apps';
+  const t = g.concepto || '';
+  for(const [re,c] of REGLAS) if(re.test(t)) return c;
+  return 'otros';
+}
+const catDe = g => g.cat || adivinarCat(g);
+const opcionesCat = (sel, conAuto) => (conAuto?`<option value="">Automática</option>`:'') +
+  CATS.map(c=>`<option value="${c.id}" ${sel===c.id?'selected':''}>${c.e} ${c.n}</option>`).join('');
+
+// ---- Pagos e ingresos fijos ----
 const idxMes = k => { const [y,m] = k.split('-').map(Number); return y*12 + (m-1); };
 function fijosDelMes(k){
   const [y,m] = k.split('-').map(Number);
@@ -352,182 +461,406 @@ function fijosDelMes(k){
   }).map(f=>{
     const n = idxMes(k) - idxMes(f.desde);
     const dia = Math.min(f.dia, nDias);
-    return {...f, diaReal: dia, fecha: `${k}-${pad(dia)}`, numCuota: n+1};
+    const ajustado = !!(f.ajustes && f.ajustes[k]!=null);
+    return {...f, tipo: f.tipo||'gasto', importe: ajustado ? f.ajustes[k] : f.importe, ajustado,
+      diaReal: dia, fecha: `${k}-${pad(dia)}`, numCuota: n+1};
   }).sort((a,b)=>a.diaReal-b.diaReal);
 }
-// ¿Ya se ha cobrado a día de hoy?
 const cobrado = f => f.fecha <= isoHoy;
-const sumaFijos = k => fijosDelMes(k).reduce((s,f)=>s+f.importe,0);
-const sumaFijosCobrados = k => fijosDelMes(k).filter(cobrado).reduce((s,f)=>s+f.importe,0);
+const progsDelMes = k => (estado.programados||[]).filter(p=>p.fecha.slice(0,7)===k).sort((a,b)=>a.fecha<b.fecha?-1:1);
 
-function saldoSugerido(){
-  // saldo final estimado del mes anterior
-  const prev = new Date(vista.y, vista.m-1, 1);
-  const mp = estado.meses[claveMes(prev.getFullYear(), prev.getMonth())];
-  if(mp && typeof mp.saldoInicial==='number') return Math.round((mp.saldoInicial + totalIngresos(mp) - totalGastos(mp) - sumaFijos(claveMes(prev.getFullYear(), prev.getMonth())))*100)/100;
-  return '';
+// ---- Tarjeta de crédito: se cobra el primer lunes del mes siguiente ----
+const esCredito = g => g.credito !== undefined ? !!g.credito : /cr[eé]dito/i.test(g.tarjeta||'');
+function primerLunes(k){ const [y,m] = k.split('-').map(Number); const d = new Date(y, m-1, 1); while(d.getDay()!==1) d.setDate(d.getDate()+1); return `${k}-${pad(d.getDate())}`; }
+const mesSiguiente = k => { const [y,m] = k.split('-').map(Number); const d = new Date(y, m, 1); return claveMes(d.getFullYear(), d.getMonth()); };
+const nombreCorto = k => { const [y,m] = k.split('-').map(Number); return nombreMes(y,m-1).split(' ')[0].toLowerCase(); };
+function liquidacionCredito(k){
+  const prevK = mesAnterior(k);
+  const mp = estado.meses[prevK] || {gastos:[]};
+  const tot = suma((mp.gastos||[]).filter(esCredito)) + suma(progsDelMes(prevK).filter(p=>p.credito));
+  if(!tot) return null;
+  return {id:'liq-'+prevK, concepto:`Tarjeta de crédito (compras de ${nombreCorto(prevK)})`, importe: r2(tot), fecha: primerLunes(k), enMaximo:true, auto:true};
 }
+// Gastos programados del mes, incluido el cargo automático de la tarjeta de crédito
+const progsConLiq = k => { const l = liquidacionCredito(k); return [...(l?[l]:[]), ...progsDelMes(k).filter(p=>!p.credito)].sort((a,b)=>a.fecha<b.fecha?-1:1); };
+const progsCredito = k => progsDelMes(k).filter(p=>p.credito);
 
+// ---- Cálculo central de un mes ----
+function calcMes(k){
+  const mes = estado.meses[k];
+  if(!mes || !mes.limite || typeof mes.saldoInicial!=='number') return null;
+  mes.ingresos = mes.ingresos || [];
+  const [y,m] = k.split('-').map(Number);
+  const nDias = diasEnMes(y, m-1);
+  const fijos = fijosDelMes(k);
+  const fG = fijos.filter(f=>f.tipo!=='ingreso'), fI = fijos.filter(f=>f.tipo==='ingreso');
+  const progs = progsConLiq(k);
+  const progMax = suma(progs.filter(p=>p.enMaximo));
+  const gastosDeb = mes.gastos.filter(g=>!esCredito(g)), gastosCred = mes.gastos.filter(esCredito);
+  const progsCred = progsCredito(k);
+  const total = suma(gastosDeb), totalCred = suma(gastosCred) + suma(progsCred);
+  const ingresos = totalIngresos(mes), extra = extraLimite(mes);
+  const limEf = mes.limite + extra;
+  const diario = limEf - progMax;            // presupuesto para el día a día
+  const queda = diario - total;
+  const fGtot = suma(fG), fItot = suma(fI), progTot = suma(progs);
+  const fGcob = suma(fG.filter(cobrado)), fIcob = suma(fI.filter(cobrado)), progCob = suma(progs.filter(cobrado));
+  const saldoActual = mes.saldoInicial + ingresos + fIcob - total - fGcob - progCob;
+  const saldoFinal = mes.saldoInicial + ingresos + fItot - Math.max(total, diario) - fGtot - progTot;
+  const saldoCierre = mes.saldoInicial + ingresos + fItot - total - fGtot - progTot;
+  const base = nDias ? diario / nDias : 0;
+  const esActual = y===hoy.getFullYear() && (m-1)===hoy.getMonth();
+  const esPasado = new Date(y, m, 1) <= new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  return {mes,k,y,m,nDias,fijos,fG,fI,progs,progMax,total,totalCred,gastosDeb,gastosCred,progsCred,cobroCred: primerLunes(mesSiguiente(k)),ingresos,extra,limEf,diario,queda,
+    fGtot,fItot,progTot,fGcob,fIcob,progCob,saldoActual,saldoFinal,saldoCierre,base,esActual,esPasado};
+}
+// Hucha diaria al final del día d
+const huchaDia = (c, d) => c.base*d - c.gastosDeb.filter(g=>parseInt(g.fecha.slice(8,10),10)<=d).reduce((s,g)=>s+g.importe,0);
+function diasEnRojo(c){
+  const hasta = c.esActual ? hoy.getDate() : (c.esPasado ? c.nDias : 0);
+  let n = 0; for(let d=1; d<=hasta; d++) if(huchaDia(c,d) < -0.005) n++;
+  return {n, de: hasta};
+}
+const mesAnterior = k => { const [y,m] = k.split('-').map(Number); const d = new Date(y, m-2, 1); return claveMes(d.getFullYear(), d.getMonth()); };
+
+function saldoSugerido(k){
+  const c = calcMes(mesAnterior(k));
+  if(!c) return '';
+  return r2(c.esPasado ? c.saldoCierre : c.saldoFinal);
+}
 function limiteSugerido(){
-  // usa el límite del mes anterior más reciente como sugerencia
   const claves = Object.keys(estado.meses).sort();
   for(let i=claves.length-1;i>=0;i--){ if(estado.meses[claves[i]].limite) return estado.meses[claves[i]].limite; }
   return '';
 }
-
-async function guardar(){
-  try{
-    localStorage.setItem(LS_KEY, JSON.stringify(estado));
-  }catch(e){
-    document.getElementById('aviso').textContent = 'No se pudo guardar el último cambio. Revisa que el iPhone tenga espacio libre.';
-  }
+// Máximo recomendado: lo que puedes gastar para acabar el mes con el ahorro que quieres
+function recomendar(k, saldoAhora, ahorro){
+  const mes = estado.meses[k] || {gastos:[], ingresos:[]};
+  const fijos = fijosDelMes(k);
+  const fG = fijos.filter(f=>f.tipo!=='ingreso'), fI = fijos.filter(f=>f.tipo==='ingreso');
+  const progs = progsConLiq(k);
+  const total = suma((mes.gastos||[]).filter(g=>!esCredito(g))), ingresos = totalIngresos(mes), extra = extraLimite(mes);
+  const saldoInicio = saldoAhora + total - ingresos - suma(fI.filter(cobrado)) + suma(fG.filter(cobrado)) + suma(progs.filter(cobrado));
+  const progMax = suma(progs.filter(p=>p.enMaximo)), progFuera = suma(progs.filter(p=>!p.enMaximo));
+  const ingNoLim = ingresos - extra;
+  // Los ingresos fijos que aún no han llegado (como la nómina a fin de mes) no se cuentan para gastar:
+  // así nunca te quedas en negativo antes de cobrarlos.
+  const fIcob = suma(fI.filter(cobrado)), fIpend = suma(fI) - fIcob;
+  const M = saldoInicio + ingNoLim + fIcob - suma(fG) - progFuera - ahorro;
+  return {M: r2(M), saldoInicio: r2(saldoInicio), ingresos: r2(ingNoLim + fIcob), ingPend: r2(fIpend), pagos: r2(suma(fG)), progFuera: r2(progFuera), progMax: r2(progMax), ahorro};
 }
 
+async function guardar(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(estado)); }
+  catch(e){ document.getElementById('aviso').textContent = 'No se pudo guardar el último cambio. Revisa que el iPhone tenga espacio libre.'; }
+}
+
+// =====================================================================
+//  Pantalla de preparar el mes
+// =====================================================================
+function renderConfig(app, k){
+  const mes = estado.meses[k];
+  const gastado = mes ? totalGastos(mes) : 0;
+  const ingresado = mes ? totalIngresos(mes) : 0;
+  const yaEmpezado = gastado>0 || ingresado>0;
+  const c = calcMes(k);
+  const saldoVal = c ? r2(c.saldoActual) : saldoSugerido(k);
+  const limVal = mes?.limite || '';
+  const ahorroVal = mes?.ahorro ?? (estado.ajustes?.ahorro || 0);
+  const [y,m] = k.split('-').map(Number);
+  app.innerHTML = `
+    <div class="config">
+      <h2>Prepara ${nombreMes(y,m-1).toLowerCase()}</h2>
+      <p>${yaEmpezado ? 'Pon lo que te aparece ahora mismo en el banco.' : 'Pon el dinero que tienes en el banco y cuánto quieres ahorrar. Te calculo cuánto puedes gastar.'}</p>
+      <label class="campo">Dinero en el banco${yaEmpezado?' ahora':''} (€)
+        <input id="saldo" class="num" type="text" inputmode="decimal" placeholder="1.200" value="${String(saldoVal).replace('.',',')}">
+      </label>
+      <label class="campo">Quiero ahorrar este mes (€)
+        <input id="ahorro" class="num" type="text" inputmode="decimal" placeholder="0" value="${String(ahorroVal).replace('.',',')}">
+      </label>
+      <div class="recomendado" id="recomendado"></div>
+      <label class="campo">Máximo que quiero gastar este mes (€)
+        <input id="lim" class="num" type="text" inputmode="decimal" placeholder="500" value="${String(limVal).replace('.',',')}">
+      </label>
+      <p class="error" id="cfg-err"></p>
+      <div class="fila">
+        ${c ? '<button id="cancelar" class="secundario">Cancelar</button>' : ''}
+        <button id="guardar-lim">Guardar</button>
+      </div>
+    </div>`;
+  const pintarRec = ()=>{
+    const s = num(document.getElementById('saldo').value);
+    const a = num(document.getElementById('ahorro').value) || 0;
+    const box = document.getElementById('recomendado');
+    if(isNaN(s)){ box.innerHTML = ''; return; }
+    const r = recomendar(k, s, a);
+    const filas = [
+      ['Dinero en el banco al empezar el mes', r.saldoInicio, ''],
+      r.ingresos ? ['Ingresos ya cobrados este mes', r.ingresos, '+'] : null,
+      r.pagos ? ['Pagos fijos', r.pagos, '−'] : null,
+      r.progFuera ? ['Gastos programados aparte', r.progFuera, '−'] : null,
+      a ? ['Ahorro', a, '−'] : null
+    ].filter(Boolean);
+    const ok = r.M > r.progMax;
+    box.innerHTML = `<div class="rec ${ok?'':'mal'}">
+      <p class="rec-etq">Máximo recomendado</p>
+      <p class="rec-cifra num">${fmt(Math.max(r.M,0))}</p>
+      <div class="rec-desglose">${filas.map(f=>`<div><span>${f[2]} ${f[0]}</span><span class="num">${fmt(f[1])}</span></div>`).join('')}</div>
+      ${r.ingPend ? `<p class="rec-nota">No cuenta ${fmt(r.ingPend)} de ingresos fijos que aún no has cobrado este mes (como la nómina): se quedarán como ahorro o para el mes siguiente.</p>`:''}
+      ${r.progMax ? `<p class="rec-nota">${fmt(r.progMax)} de ese máximo ya están reservados para gastos programados (preventas, cargo de la tarjeta de crédito…).</p>`:''}
+      ${!ok ? `<p class="rec-nota">Con tus pagos de este mes no te queda margen para el día a día. Prueba a reducir el ahorro.</p>`:''}
+      ${ok ? `<button class="usar-rec" id="usar-rec">Usar ${fmt(r.M)}</button>`:''}
+    </div>`;
+    const u = document.getElementById('usar-rec');
+    if(u) u.onclick = ()=>{ document.getElementById('lim').value = r.M.toFixed(2).replace('.',','); };
+  };
+  ['saldo','ahorro'].forEach(id=>document.getElementById(id).addEventListener('input', pintarRec));
+  pintarRec();
+  if(!limVal){ const s = num(document.getElementById('saldo').value); if(!isNaN(s)){ const r = recomendar(k, s, num(document.getElementById('ahorro').value)||0); if(r.M>r.progMax) document.getElementById('lim').placeholder = r.M.toFixed(2).replace('.',','); } }
+
+  const ok = async ()=>{
+    const saldo = num(document.getElementById('saldo').value);
+    const ahorro = num(document.getElementById('ahorro').value) || 0;
+    const lim = num(document.getElementById('lim').value);
+    const err = document.getElementById('cfg-err');
+    if(isNaN(saldo)){ err.textContent = 'Escribe el dinero que tienes en el banco.'; return; }
+    if(!(lim>0)){ err.textContent = 'Escribe un máximo de gasto mayor que cero (o pulsa «Usar» en el recomendado).'; return; }
+    estado.meses[k] = estado.meses[k] || {gastos:[], ingresos:[]};
+    const r = recomendar(k, saldo, ahorro);
+    estado.meses[k].limite = lim;
+    estado.meses[k].ahorro = ahorro;
+    estado.meses[k].saldoInicial = r.saldoInicio;
+    estado.ajustes = {...(estado.ajustes||{}), ahorro};
+    editandoLimite = false;
+    render(); await guardar();
+  };
+  document.getElementById('guardar-lim').onclick = ok;
+  const cn = document.getElementById('cancelar'); if(cn) cn.onclick = ()=>{ editandoLimite=false; render(); };
+  ['saldo','ahorro','lim'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') ok(); });
+}
+
+// =====================================================================
+//  Bloques de la pantalla principal
+// =====================================================================
+function bloqueDiario(c){
+  if(c.esPasado && !c.esActual) return bloqueResumen(c);
+  if(c.diario <= 0){
+    return `<div class="diario mal"><p class="etq-diario">Sin margen para el día a día</p><p class="grande num negativo">${fmt(c.diario)}</p>
+      <p class="sub">Los gastos programados que cuentan en tu máximo ocupan todo el presupuesto del mes. Sube el máximo o márcalos como «aparte».</p></div>`;
+  }
+  if(!c.esActual){
+    return `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(c.base)} al día</p>
+      <p class="sub">durante los ${c.nDias} días del mes${c.progMax?` · ya descontados ${fmt(c.progMax)} de gastos programados`:''}</p></div>`;
+  }
+  const d = hoy.getDate();
+  const hucha = huchaDia(c, d);
+  const gastadoHoy = c.gastosDeb.filter(g=>g.fecha===isoHoy).reduce((s,g)=>s+g.importe,0);
+  const diasRestantes = c.nDias - d + 1;
+  const mediaResto = diasRestantes > 1 ? c.queda / (diasRestantes - 1) : null;
+  const lineaMedia = mediaResto!==null ? `<br>Media para el resto del mes: ${fmt(mediaResto)} al día` : '';
+  if(hucha >= 0){
+    return `<div class="diario"><p class="etq-diario">Hoy puedes gastar</p><p class="grande num">${fmt(hucha)}</p>
+      <p class="sub">Cada día se suman ${fmt(c.base)} · hoy llevas ${fmt(gastadoHoy)}<br>Lo que no gastes se acumula para mañana${lineaMedia}</p></div>`;
+  }
+  const diasRecuperar = Math.ceil(-hucha / c.base);
+  return `<div class="diario mal"><p class="etq-diario">Vas en negativo</p><p class="grande num negativo">${fmt(hucha)}</p>
+    <p class="sub">Cada día se suman ${fmt(c.base)} · hoy llevas ${fmt(gastadoHoy)}<br>Si no gastas nada, lo compensarás ${diasRecuperar===1?'mañana':`en ${diasRecuperar} días`}${lineaMedia}</p></div>`;
+}
+
+function bloqueResumen(c){
+  const todos = [...c.mes.gastos, ...c.progs.filter(p=>!p.auto), ...c.progsCred];
+  const mayor = todos.slice().sort((a,b)=>b.importe-a.importe)[0];
+  const porCat = {}; todos.forEach(g=>{ const id = catDe(g); porCat[id] = (porCat[id]||0) + g.importe; });
+  const topCat = Object.entries(porCat).sort((a,b)=>b[1]-a[1])[0];
+  const rojo = diasEnRojo(c);
+  const ahorrado = c.saldoCierre - c.mes.saldoInicial;
+  const prev = calcMes(mesAnterior(c.k));
+  let comp = '';
+  if(prev && prev.total + prev.progMax > 0){
+    const a = c.total + c.progMax, b = prev.total + prev.progMax;
+    const pct = Math.round((a-b)/b*100);
+    const [py,pm] = prev.k.split('-').map(Number);
+    comp = `<div class="res-fila"><span>Frente a ${nombreMes(py,pm-1).split(' ')[0].toLowerCase()}</span><span class="num ${pct>0?'txt-mal':'txt-bien'}">${pct>0?'+':''}${pct} %</span></div>`;
+  }
+  const dentro = c.queda >= 0;
+  return `<div class="diario resumen ${dentro?'':'mal'}">
+    <p class="etq-diario">Resumen del mes</p>
+    <p class="grande num ${dentro?'':'negativo'}">${dentro?`Te sobraron ${fmt(c.queda)}`:`Te pasaste ${fmt(-c.queda)}`}</p>
+    <div class="res-tabla">
+      <div class="res-fila"><span>Gastado del máximo</span><span class="num">${fmt(c.total + c.progMax)} de ${fmt(c.limEf)}</span></div>
+      <div class="res-fila"><span>${ahorrado>=0?'Ahorrado en el banco':'El banco bajó'}</span><span class="num ${ahorrado>=0?'txt-bien':'txt-mal'}">${fmt(Math.abs(ahorrado))}</span></div>
+      <div class="res-fila"><span>Días en rojo</span><span class="num">${rojo.n} de ${rojo.de}</span></div>
+      ${mayor?`<div class="res-fila"><span>Mayor gasto</span><span class="num">${esc(mayor.concepto||'Sin concepto')} · ${fmt(mayor.importe)}</span></div>`:''}
+      ${topCat?`<div class="res-fila"><span>Donde más gastaste</span><span>${catInfo(topCat[0]).e} ${catInfo(topCat[0]).n} · ${fmt(topCat[1])}</span></div>`:''}
+      ${comp}
+    </div></div>`;
+}
+
+function bloqueBarra(c){
+  const pctRes = Math.min(100, c.progMax / c.limEf * 100);
+  const pctGas = Math.min(100 - pctRes, Math.max(0, c.total / c.limEf * 100));
+  const diaHoy = c.esActual ? hoy.getDate() : (c.esPasado ? c.nDias : 0);
+  const ritmoPct = Math.min(100, (c.progMax + c.base*diaHoy) / c.limEf * 100);
+  const color = c.queda < 0 ? 'var(--bad)' : (c.esActual && pctRes+pctGas > ritmoPct+3 ? 'var(--warn)' : 'var(--good)');
+  return `<div class="barra" role="img" aria-label="Gastado ${Math.round(pctRes+pctGas)} % del máximo">
+      ${pctRes>0?`<div class="reservado" style="width:${pctRes}%"></div>`:''}
+      <div class="lleno" style="left:${pctRes}%;width:${pctGas}%;background:${color}"></div>
+      ${c.esActual?`<div class="ritmo" style="left:${ritmoPct}%"></div>`:''}
+    </div>
+    <div class="leyenda"><span>Gastado ${fmt(c.total)}</span>${c.progMax?`<span><i class="muestra"></i>Reservado ${fmt(c.progMax)}</span>`:''}${c.esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>`;
+}
+
+function avisoCopia(){
+  const hayDatos = Object.values(estado.meses).some(m=>(m.gastos||[]).length || (m.ingresos||[]).length);
+  if(!hayDatos) return '';
+  const ref = estado.ultimaCopia || estado.creado || Date.now();
+  const dias = Math.floor((Date.now() - ref) / DIA_MS);
+  if(dias < 7) return '';
+  return `<div class="aviso-copia"><p>${estado.ultimaCopia ? `Hace ${dias} días que no haces una copia de seguridad.` : 'Aún no has hecho ninguna copia de seguridad.'} Tus datos solo están en este iPhone.</p>
+    <button id="copia-ya">Guardar copia ahora</button></div>`;
+}
+
+function bloqueCategorias(c){
+  const todos = [...c.mes.gastos, ...c.progs.filter(p=>!p.auto), ...c.progsCred];
+  if(!todos.length) return '<p class="vacio">Cuando apuntes gastos verás aquí en qué se te va el dinero.</p>';
+  const porCat = {}; todos.forEach(g=>{ const id = catDe(g); porCat[id] = (porCat[id]||0) + g.importe; });
+  const tot = Object.values(porCat).reduce((s,v)=>s+v,0);
+  const lista = Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
+  const max = lista[0][1];
+  return `<div class="cats">${lista.map(([id,v])=>{ const ci = catInfo(id); return `
+    <button class="cat-fila" data-cat="${id}">
+      <span class="cat-emoji" aria-hidden="true">${ci.e}</span>
+      <span class="cat-cuerpo"><span class="cat-cab"><span class="cat-nombre">${ci.n}</span><span class="cat-imp num">${fmt(v)}</span></span>
+      <span class="cat-barra"><span style="width:${v/max*100}%"></span></span>
+      <span class="cat-pct">${Math.round(v/tot*100)} % del gasto</span></span>
+    </button>`; }).join('')}</div>`;
+}
+
+function filaFijo(f){
+  const sub = (cobrado(f) ? (f.tipo==='ingreso'?'Cobrado':'Cobrado') : 'Pendiente') +
+    (f.cuotas===1 ? ' · pago único' : f.cuotas ? ` · cuota ${f.numCuota} de ${f.cuotas}` : ' · todos los meses') +
+    (f.ajustado ? ' · importe cambiado este mes' : '');
+  return `<div class="fijo ${f.tipo} ${cobrado(f)?'hecho':''} ${fijoEdit===f.id?'editando':''}" data-fid="${f.id}" role="button" tabindex="0">
+    <div class="fijo-dia num"><span>${f.diaReal}</span></div>
+    <div class="fijo-info"><span class="fijo-nombre">${esc(f.nombre)}</span><span class="fijo-sub">${sub}</span></div>
+    <span class="imp num">${f.tipo==='ingreso'?'+':'−'}${fmt(f.importe)}</span></div>`;
+}
+
+function formFijo(k){
+  const f = fijoEdit && fijoEdit!=='nuevo' ? (estado.fijos||[]).find(x=>x.id===fijoEdit) : null;
+  const ajuste = f && f.ajustes && f.ajustes[k]!=null ? String(f.ajustes[k]).replace('.',',') : '';
+  const [y,m] = k.split('-').map(Number);
+  return `<div class="form fijo-form" id="fijo-form">
+    <div class="ancho"><div class="selector" role="tablist">
+      <button data-ft="gasto" class="${fijoTipo==='gasto'?'activo':''}">Pago</button>
+      <button data-ft="ingreso" class="${fijoTipo==='ingreso'?'activo':''}">Ingreso</button>
+    </div></div>
+    <label class="ancho">Nombre<input id="f-nom" type="text" maxlength="40" placeholder="${fijoTipo==='ingreso'?'Nómina, alquiler que cobras…':'Letra del coche, gimnasio…'}" value="${esc(f?.nombre||'')}"></label>
+    <label>Importe (€)<input id="f-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00" value="${f?String(f.importe).replace('.',','):''}"></label>
+    <label>Día de cobro<input id="f-dia" type="text" inputmode="numeric" placeholder="3" value="${f?f.dia:''}"></label>
+    <label class="ancho">Número de cuotas (vacío si es todos los meses)<input id="f-cuo" type="text" inputmode="numeric" placeholder="Todos los meses" value="${f&&f.cuotas?f.cuotas:''}"></label>
+    ${f?`<label class="ancho">Importe solo en ${nombreMes(y,m-1).toLowerCase()} (opcional, para recibos que cambian)<input id="f-aj" class="importe" type="text" inputmode="decimal" placeholder="El de siempre" value="${ajuste}"></label>`:''}
+    <p class="error" id="f-err"></p>
+    <button class="secundario-btn" id="f-cancel">Cancelar</button>
+    <button class="primario mitad ${fijoTipo==='ingreso'?'verde':''}" id="f-add">${f?'Guardar cambios':'Guardar'}</button>
+    ${f?`<button class="peligro" id="f-del">Quitar</button>`:''}
+    ${f?'':`<p class="copia-nota ancho">Empezará en ${nombreMes(y,m-1).toLowerCase()}.</p>`}
+  </div>`;
+}
+
+function filaProg(p){
+  if(p.auto) return `<div class="fijo prog auto ${cobrado(p)?'hecho':''}">
+    <div class="fijo-dia num"><span>${parseInt(p.fecha.slice(8,10),10)}</span></div>
+    <div class="fijo-info"><span class="fijo-nombre">💳 ${esc(p.concepto)}</span>
+      <span class="fijo-sub">${cobrado(p)?'Cobrado':'Pendiente'} · automático · cuenta en tu máximo</span></div>
+    <span class="imp num">−${fmt(p.importe)}</span></div>`;
+  const sub = p.credito
+    ? `${p.fecha<=isoHoy?'Cargado en la tarjeta':'Se carga en la tarjeta'} · 💳 se cobra el ${fmtFecha(primerLunes(mesSiguiente(p.fecha.slice(0,7))))}`
+    : `${cobrado(p)?'Cobrado':'Pendiente'} · ${p.enMaximo?'cuenta en tu máximo':'aparte del máximo'}`;
+  return `<div class="fijo prog ${cobrado(p)&&!p.credito?'hecho':''} ${p.credito?'con-credito':''} ${progEdit===p.id?'editando':''}" data-pid="${p.id}" role="button" tabindex="0">
+    <div class="fijo-dia num"><span>${parseInt(p.fecha.slice(8,10),10)}</span></div>
+    <div class="fijo-info"><span class="fijo-nombre">${catInfo(catDe(p)).e} ${esc(p.concepto)}</span>
+      <span class="fijo-sub">${sub}</span></div>
+    <span class="imp num">−${fmt(p.importe)}</span></div>`;
+}
+
+function formProg(k){
+  const p = progEdit && progEdit!=='nuevo' ? (estado.programados||[]).find(x=>x.id===progEdit) : null;
+  const fechaDef = p ? p.fecha : (k===isoHoy.slice(0,7) ? isoHoy : `${k}-01`);
+  return `<div class="form fijo-form" id="prog-form">
+    <label class="ancho">Concepto<input id="p-con" type="text" maxlength="60" placeholder="Preventa, regalo encargado…" value="${esc(p?.concepto||'')}"></label>
+    <label>Importe (€)<input id="p-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00" value="${p?String(p.importe).replace('.',','):''}"></label>
+    <label>Fecha de cobro<input id="p-fecha" type="date" min="2026-11-01" value="${fechaDef}"></label>
+    <label class="ancho">Categoría<select id="p-cat">${opcionesCat(p?.cat||'', true)}</select></label>
+    <label class="ancho check"><input id="p-cred" type="checkbox" ${p && p.credito ? 'checked':''}> <span>Lo pago con tarjeta de crédito (el banco lo cobra el primer lunes del mes siguiente)</span></label>
+    <label class="ancho check" id="p-max-fila" ${p && p.credito ? 'hidden':''}><input id="p-max" type="checkbox" ${!p || p.enMaximo ? 'checked':''}> <span>Cuenta en mi máximo de gasto del mes (se reserva desde el día 1)</span></label>
+    <p class="copia-nota ancho" id="p-cred-nota" ${p && p.credito ? '':'hidden'}>Contará en el máximo del mes en que se cobre, dentro del cargo de la tarjeta de crédito.</p>
+    <p class="error" id="p-err"></p>
+    <button class="secundario-btn" id="p-cancel">Cancelar</button>
+    <button class="primario mitad" id="p-add">${p?'Guardar cambios':'Guardar'}</button>
+    ${p?`<button class="peligro" id="p-del">Borrar</button>`:''}
+  </div>`;
+}
+
+// =====================================================================
+//  Render principal
+// =====================================================================
 function render(){
   document.getElementById('titulo-mes').textContent = nombreMes(vista.y,vista.m);
   document.getElementById('prev').style.visibility = (vista.y*12+vista.m <= INICIO.y*12+INICIO.m) ? 'hidden' : 'visible';
+  pintarUltimaCopia();
   const app = document.getElementById('app');
-  const mes = mesActual();
+  const k = claveMes(vista.y,vista.m);
+  const c = calcMes(k);
+  if(!c || editandoLimite){ renderConfig(app, k); return; }
+  const mes = c.mes;
 
-  if(!mes || !mes.limite || typeof mes.saldoInicial!=='number' || editandoLimite){
-    const gastado = mes ? totalGastos(mes) : 0;
-    const ingresado = mes ? totalIngresos(mes) : 0;
-    const saldoVal = (mes && typeof mes.saldoInicial==='number') ? Math.round((mes.saldoInicial+ingresado-gastado-sumaFijosCobrados(claveMes(vista.y,vista.m)))*100)/100 : saldoSugerido();
-    const limVal = mes?.limite || limiteSugerido();
-    app.innerHTML = `
-      <div class="config">
-        <h2>Prepara ${nombreMes(vista.y,vista.m).toLowerCase()}</h2>
-        <p>${(gastado>0||ingresado>0) ? 'Pon lo que te aparece ahora mismo en el banco.' : 'Pon el dinero que tienes en el banco y cuánto quieres gastar como máximo este mes.'}</p>
-        <label class="campo">Dinero en el banco${(gastado>0||ingresado>0)?' ahora':''} (€)
-          <input id="saldo" class="num" type="text" inputmode="decimal" placeholder="1.200" value="${saldoVal}">
-        </label>
-        <label class="campo">Máximo que quiero gastar este mes (€)
-          <input id="lim" class="num" type="text" inputmode="decimal" placeholder="500" value="${limVal}">
-        </label>
-        <p class="error" id="cfg-err"></p>
-        <div class="fila">
-          ${mes && mes.limite && typeof mes.saldoInicial==='number' ? '<button id="cancelar" class="secundario">Cancelar</button>' : ''}
-          <button id="guardar-lim">Guardar</button>
-        </div>
-      </div>`;
-    const ok = async ()=>{
-      const saldo = num(document.getElementById('saldo').value);
-      const lim = num(document.getElementById('lim').value);
-      const err = document.getElementById('cfg-err');
-      if(isNaN(saldo)){ err.textContent = 'Escribe el dinero que tienes en el banco.'; return; }
-      if(!(lim>0)){ err.textContent = 'Escribe un máximo de gasto mayor que cero.'; return; }
-      const k = claveMes(vista.y,vista.m);
-      estado.meses[k] = estado.meses[k] || {gastos:[]};
-      estado.meses[k].limite = lim;
-      // guardamos el saldo del inicio del mes: lo de ahora + lo ya gastado
-      estado.meses[k].saldoInicial = Math.round((saldo + totalGastos(estado.meses[k]) - totalIngresos(estado.meses[k]) + sumaFijosCobrados(k))*100)/100;
-      editandoLimite = false;
-      render(); await guardar();
-    };
-    document.getElementById('guardar-lim').onclick = ok;
-    const c = document.getElementById('cancelar'); if(c) c.onclick = ()=>{ editandoLimite=false; editMov=null; render(); };
-    ['saldo','lim'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') ok(); });
-    return;
-  }
-
-  if(!mes.ingresos) mes.ingresos = [];
-  const total = totalGastos(mes);
-  const ingresos = totalIngresos(mes);
-  const extra = extraLimite(mes);
-  const limEf = mes.limite + extra;
-  const queda = limEf - total;
-  const kMes = claveMes(vista.y,vista.m);
-  const fijos = fijosDelMes(kMes);
-  const fijosTotal = sumaFijos(kMes);
-  const fijosCobr = sumaFijosCobrados(kMes);
-  const saldoActual = mes.saldoInicial + ingresos - total - fijosCobr;
-  const saldoFinalPrevisto = mes.saldoInicial + ingresos - Math.max(total, limEf) - fijosTotal;
-  const nDias = diasEnMes(vista.y,vista.m);
-  const esActual = vista.y===hoy.getFullYear() && vista.m===hoy.getMonth();
-  const esPasado = new Date(vista.y,vista.m+1,1) <= new Date(hoy.getFullYear(),hoy.getMonth(),1);
-  const diaHoy = esActual ? hoy.getDate() : (esPasado ? nDias : 0);
-  const diasRestantes = esActual ? nDias - hoy.getDate() + 1 : (esPasado ? 0 : nDias);
-  const pct = Math.min(100, Math.max(0, total/limEf*100));
-  const ritmoPct = diaHoy/nDias*100;
-  const gastadoHoy = mes.gastos.filter(g=>g.fecha===isoHoy).reduce((s,g)=>s+g.importe,0);
-  const color = total>limEf ? 'var(--bad)' : (pct>ritmoPct+5 ? 'var(--warn)' : 'var(--good)');
-
-  let diario;
-  if(esPasado && !esActual){
-    diario = queda>=0
-      ? `<div class="diario"><p class="grande num">Ahorraste ${fmt(queda)}</p><p class="sub">Cerraste el mes por debajo de tu límite.</p></div>`
-      : `<div class="diario mal"><p class="grande num">Te pasaste ${fmt(-queda)}</p><p class="sub">Gastaste más de lo previsto este mes.</p></div>`;
-  } else if(queda<0){
-    diario = `<div class="diario mal"><p class="grande num">Te has pasado ${fmt(-queda)}</p><p class="sub">Intenta no gastar más hasta que acabe el mes.</p></div>`;
-  } else {
-    if(esActual){
-      // Hucha diaria: cada día se suma la parte del mes que le toca; lo que sobra o falta se arrastra
-      const base = limEf / nDias;
-      const gastadoHastaHoy = mes.gastos.filter(g=>g.fecha<=isoHoy).reduce((s,g)=>s+g.importe,0);
-      const hucha = base * hoy.getDate() - gastadoHastaHoy;
-      const mediaResto = diasRestantes > 1 ? queda / (diasRestantes - 1) : null;
-      const lineaMedia = mediaResto!==null ? `<br>Media para el resto del mes: ${fmt(mediaResto)} al día` : '';
-      if(hucha >= 0){
-        diario = `<div class="diario"><p class="etq-diario">Hoy puedes gastar</p><p class="grande num">${fmt(hucha)}</p>
-          <p class="sub">Cada día se suman ${fmt(base)} · hoy llevas ${fmt(gastadoHoy)}<br>Lo que no gastes se acumula para mañana${lineaMedia}</p></div>`;
-      } else {
-        const diasRecuperar = Math.ceil(-hucha / base);
-        diario = `<div class="diario mal"><p class="etq-diario">Vas en negativo</p><p class="grande num negativo">${fmt(hucha)}</p>
-          <p class="sub">Cada día se suman ${fmt(base)} · hoy llevas ${fmt(gastadoHoy)}<br>Si no gastas nada, lo compensarás ${diasRecuperar===1?'mañana':`en ${diasRecuperar} días`}${lineaMedia}</p></div>`;
-      }
-    } else {
-      const porDiaPerm = queda/diasRestantes;
-      diario = `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(porDiaPerm)} al día</p>
-        <p class="sub">durante los ${diasRestantes} días del mes</p></div>`;
-    }
-  }
-
-  // agrupar movimientos por día
-  const movs = [...mes.gastos.map(g=>({...g,tipo:'gasto'})), ...mes.ingresos.map(g=>({...g,tipo:'ingreso'}))];
-  const porDia = {};
-  movs.forEach(g=>{ (porDia[g.fecha] = porDia[g.fecha] || []).push(g); });
-  const fechas = Object.keys(porDia).sort().reverse();
-  const orden = [];
-  const listado = fechas.length ? fechas.map(f=>{
-    const d = new Date(f+'T12:00:00');
-    const diaTxt = d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'}).replace(',','');
-    const etiqueta = (f===isoHoy ? 'Hoy · ' : '') + diaTxt.charAt(0).toUpperCase()+diaTxt.slice(1);
-    const items = porDia[f].slice().sort((a,b)=>(b.hora||0)-(a.hora||0));
-    const gastoDia = items.filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
-    return `<div class="dia"><div class="dia-cab"><span class="dia-nombre">${etiqueta}</span><span class="num dia-total">${gastoDia>0?'Gastado '+fmt(gastoDia):''}</span></div>
-      <div class="dia-lista">${items.map(g=>{ orden.push(g); return `<div class="gasto ${g.tipo} ${editMov && editMov.id===g.id?'editando':''}" data-id="${g.id}" data-tipo="${g.tipo}" role="button" tabindex="0" aria-label="Modificar movimiento">
-        <span class="avatar" aria-hidden="true"></span>
-        <span class="info"><span class="concepto"></span><span class="meta"></span></span>
-        <span class="imp num">${g.tipo==='ingreso'?'+':'−'}${fmt(g.importe)}</span></div>`; }).join('')}</div></div>`;
-  }).join('') : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero más abajo.</p>';
-
-  const minF = `${vista.y}-${pad(vista.m+1)}-01`, maxF = `${vista.y}-${pad(vista.m+1)}-${pad(nDias)}`;
-  const fechaDef = esActual ? isoHoy : minF;
+  const nDias = c.nDias;
+  const minF = `${k}-01`, maxF = `${k}-${pad(nDias)}`;
+  const fechaDef = c.esActual ? isoHoy : minF;
   const esIngreso = tipoMov==='ingreso';
+  const pendFijos = c.fGtot - c.fGcob, pendProg = c.progTot - c.progCob, pendIng = c.fItot - c.fIcob;
+  const notas = [
+    c.ingresos>0 ? `Este mes han entrado ${fmt(c.ingresos + c.fIcob)}.` : (c.fIcob>0 ? `Este mes han entrado ${fmt(c.fIcob)}.` : ''),
+    pendIng>0 ? `Quedan ${fmt(pendIng)} de ingresos fijos por cobrar.` : '',
+    (pendFijos+pendProg)>0 ? `Quedan ${fmt(pendFijos+pendProg)} de pagos fijos y programados por cobrar.` : '',
+    c.totalCred>0 ? `Con la tarjeta de crédito este mes: ${fmt(c.totalCred)}. Se cobrará el lunes ${fmtFecha(c.cobroCred)} y contará en el máximo de ${nombreCorto(mesSiguiente(k))}.` : ''
+  ].filter(Boolean).join(' ');
+  const prevC = calcMes(mesAnterior(k));
+  const masProgs = (estado.programados||[]).filter(p=>p.fecha.slice(0,7) > k);
 
   app.innerHTML = `
+    ${avisoCopia()}
     <div class="hero">
-      <p class="quedan">${queda>=0?'Te quedan':'Vas por encima'}</p>
-      <p class="cifra num ${queda<0?'negativo':''}">${fmtGrande(Math.abs(queda))}</p>
-      <p class="de">de ${fmt(limEf)}${extra>0?` (${fmt(mes.limite)} + ${fmt(extra)} extra)`:''} · <button id="editar">editar</button></p>
-      <div class="barra" role="img" aria-label="Gastado ${Math.round(pct)}% del límite">
-        <div class="lleno" style="width:${pct}%;background:${color}"></div>
-        ${esActual?`<div class="ritmo" style="left:${ritmoPct}%" title="Dónde deberías ir hoy"></div>`:''}
-      </div>
-      <div class="leyenda"><span>Gastado ${fmt(total)}</span>${esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>
-      ${diario}
+      <p class="quedan">${c.queda>=0?'Te quedan':'Vas por encima'}</p>
+      <p class="cifra num ${c.queda<0?'negativo':''}">${fmtGrande(Math.abs(c.queda))}</p>
+      <p class="de">de ${fmt(c.limEf)}${c.extra>0?` (${fmt(mes.limite)} + ${fmt(c.extra)} extra)`:''} · <button id="editar">editar</button></p>
+      ${bloqueBarra(c)}
+      ${bloqueDiario(c)}
       <div class="banco">
-        <div><p class="etq">En el banco</p><p class="valor num ${saldoActual<0?'negativo':''}">${fmt(saldoActual)}</p></div>
-        <div><p class="etq">${esPasado && !esActual ? 'Al cerrar el mes' : 'Si cumples tu máximo, acabarás con'}</p><p class="valor num">${fmt(esPasado && !esActual ? saldoActual : saldoFinalPrevisto)}</p></div>
+        <div><p class="etq">En el banco</p><p class="valor num ${c.saldoActual<0?'negativo':''}">${fmt(c.saldoActual)}</p></div>
+        <div><p class="etq">${c.esPasado && !c.esActual ? 'Al cerrar el mes' : 'Si cumples tu máximo, acabarás con'}</p>
+          <p class="valor num ${(c.esPasado && !c.esActual ? c.saldoCierre : c.saldoFinal)<0?'negativo':''}">${fmt(c.esPasado && !c.esActual ? c.saldoCierre : c.saldoFinal)}</p></div>
       </div>
-      ${(ingresos>0 || fijosTotal-fijosCobr>0)?`<p class="nota-ingresos">${[ingresos>0?`Este mes han entrado ${fmt(ingresos)}.`:'', fijosTotal-fijosCobr>0?`Quedan ${fmt(fijosTotal-fijosCobr)} de pagos fijos por cobrar.`:''].filter(Boolean).join(' ')}</p>`:''}
-      <button class="ajustar" id="ajustar">El banco me dice otra cantidad</button>
+      ${notas?`<p class="nota-ingresos">${notas}</p>`:''}
+      <div class="acciones-hero">
+        <button class="ajustar" id="ajustar">El banco me dice otra cantidad</button>
+        ${c.esActual && prevC ? `<button class="ajustar" id="ver-resumen">Ver resumen de ${nombreMes(prevC.y,prevC.m-1).split(' ')[0].toLowerCase()}</button>`:''}
+      </div>
     </div>
 
-    <section>
+    <section id="sec-movs">
       <h2>Movimientos</h2>
-      ${fechas.length?'<p class="pista">Toca un movimiento para modificarlo o borrarlo.</p>':''}
-      ${listado}
+      <div class="filtros">
+        <input id="f-q" type="search" placeholder="Buscar" value="${esc(filtro.q)}" aria-label="Buscar movimientos">
+        <select id="f-tipo" aria-label="Filtrar movimientos">
+          <option value="todos" ${filtro.tipo==='todos'?'selected':''}>Todos</option>
+          <option value="gasto" ${filtro.tipo==='gasto'?'selected':''}>Solo gastos</option>
+          <option value="ingreso" ${filtro.tipo==='ingreso'?'selected':''}>Solo ingresos</option>
+          ${CATS.map(ct=>`<option value="cat:${ct.id}" ${filtro.tipo==='cat:'+ct.id?'selected':''}>${ct.e} ${ct.n}</option>`).join('')}
+        </select>
+      </div>
+      <div id="lista-movs"></div>
     </section>
 
     <section id="form-mov">
@@ -540,7 +873,9 @@ function render(){
         <label>Importe (€)<input id="g-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00"></label>
         <label>Fecha<input id="g-fecha" type="date" value="${fechaDef}" min="${minF}" max="${maxF}"></label>
         <label class="ancho">Concepto<input id="g-con" type="text" maxlength="60" placeholder="${esIngreso?'Nómina, bizum, devolución…':'Supermercado, cena, gasolina…'}"></label>
-        ${esIngreso?`<label class="ancho check"><input id="g-lim" type="checkbox"> <span>Sumarlo también a lo que puedo gastar este mes</span></label>`:''}
+        ${esIngreso?`<label class="ancho check"><input id="g-lim" type="checkbox"> <span>Sumarlo también a lo que puedo gastar este mes</span></label>`
+          :`<label>Categoría<select id="g-cat">${opcionesCat('', true)}</select></label>
+            <label>Pagado con<select id="g-pago"><option value="debito">Débito o efectivo</option><option value="credito">Tarjeta de crédito</option></select></label>`}
         <p class="error" id="g-err"></p>
         ${editMov ? `<button class="secundario-btn" id="g-cancel">Cancelar</button>
         <button class="primario mitad ${esIngreso?'verde':''}" id="g-add">Guardar cambios</button>
@@ -550,30 +885,30 @@ function render(){
     </section>
 
     <section>
-      <div class="cab-seccion"><h2>Pagos fijos de este mes</h2>${fijos.length?`<span class="num total-fijos">${fmt(fijosTotal)}</span>`:''}</div>
-      <p class="copia-nota">Se descuentan de tu dinero en el banco, pero no de lo que puedes gastar al día.</p>
-      ${fijos.length ? fijos.map(f=>`<div class="fijo ${cobrado(f)?'hecho':''}">
-          <div class="fijo-dia num"><span>${f.diaReal}</span></div>
-          <div class="fijo-info"><span class="fijo-nombre"></span><span class="fijo-sub">${cobrado(f)?'Cobrado':'Pendiente'}${f.cuotas===1?' · pago único':f.cuotas?` · cuota ${f.numCuota} de ${f.cuotas}`:' · todos los meses'}</span></div>
-          <span class="imp num">${fmt(f.importe)}</span>
-          <button class="borrar quitar-fijo" data-id="${f.id}" aria-label="Quitar pago fijo">×</button>
-        </div>`).join('') : '<p class="vacio">No tienes pagos fijos este mes.</p>'}
-      ${fijoFormAbierto ? `<div class="form fijo-form">
-          <label class="ancho">Nombre<input id="f-nom" type="text" maxlength="40" placeholder="Letra del coche, gimnasio…"></label>
-          <label>Importe (€)<input id="f-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00"></label>
-          <label>Día de cobro<input id="f-dia" type="text" inputmode="numeric" placeholder="3"></label>
-          <label class="ancho">Número de cuotas (vacío si es todos los meses)<input id="f-cuo" type="text" inputmode="numeric" placeholder="Todos los meses"></label>
-          <p class="error" id="f-err"></p>
-          <button class="secundario-btn" id="f-cancel">Cancelar</button>
-          <button class="primario mitad" id="f-add">Guardar pago fijo</button>
-        </div>
-        <p class="copia-nota">Empezará a cobrarse en ${nombreMes(vista.y,vista.m).toLowerCase()}.</p>`
-        : `<button class="ajustar" id="f-abrir">Añadir un pago fijo</button>`}
+      <div class="cab-seccion"><h2>Pagos e ingresos fijos</h2>${c.fGtot?`<span class="num total-fijos">−${fmt(c.fGtot)}</span>`:''}</div>
+      <p class="copia-nota">Se descuentan (o suman) a tu dinero en el banco el día de cobro, pero no cuentan en lo que puedes gastar al día. Toca uno para modificarlo.</p>
+      ${c.fG.length ? `<p class="subtitulo">Pagos</p>${c.fG.map(filaFijo).join('')}` : ''}
+      ${c.fI.length ? `<p class="subtitulo">Ingresos</p>${c.fI.map(filaFijo).join('')}` : ''}
+      ${!c.fijos.length ? '<p class="vacio">No tienes pagos ni ingresos fijos este mes.</p>' : ''}
+      ${fijoEdit ? formFijo(k) : `<button class="ajustar" id="f-abrir">Añadir un pago o ingreso fijo</button>`}
+    </section>
+
+    <section>
+      <div class="cab-seccion"><h2>Gastos programados</h2>${c.progTot?`<span class="num total-fijos">−${fmt(c.progTot)}</span>`:''}</div>
+      <p class="copia-nota">Compras ya hechas que se cobrarán en una fecha concreta, como una preventa. Se descuentan del banco el día del cobro y, si cuentan en tu máximo, se reservan desde el principio del mes.</p>
+      ${(c.progs.length || c.progsCred.length) ? [...c.progs, ...c.progsCred].sort((a,b)=>a.fecha<b.fecha?-1:1).map(filaProg).join('') : '<p class="vacio">No tienes gastos programados este mes.</p>'}
+      ${masProgs.length ? `<p class="copia-nota" style="margin-top:10px">En los próximos meses: ${masProgs.length} gasto${masProgs.length===1?'':'s'} programado${masProgs.length===1?'':'s'} (${fmt(suma(masProgs))}).</p>`:''}
+      ${progEdit ? formProg(k) : `<button class="ajustar" id="p-abrir">Añadir un gasto programado</button>`}
+    </section>
+
+    <section>
+      <h2>En qué gastas</h2>
+      ${bloqueCategorias(c)}
     </section>
 
     <section>
       <h2>Gasto por día</h2>
-      <div class="grafico">${grafico(mes, nDias, limEf)}</div>
+      <div class="grafico">${grafico(c)}</div>
     </section>
 
     <section>
@@ -584,47 +919,152 @@ function render(){
       </div>
     </section>`;
 
-  // conceptos con textContent (evita inyectar HTML)
-  const filas = app.querySelectorAll('.gasto[data-id]');
-  orden.forEach((g,k)=>{
-    const fila = filas[k];
-    const concepto = g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto');
-    fila.querySelector('.concepto').textContent = concepto;
-    const hora = g.hora ? new Date(g.hora).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}) : '';
-    const origen = g.origen==='applepay'?'Apple Pay':g.origen==='cartera'?'Cartera':g.origen==='captura'?'Compra en app':(g.tipo==='ingreso'?'Ingreso':'Manual');
-    fila.querySelector('.meta').textContent = [hora, origen, g.tarjeta, g.alLimite?'suma al máximo':''].filter(Boolean).join(' · ');
-    const letra = (concepto.match(/[A-Za-zÁÉÍÓÚÑáéíóúñÜü0-9]/)||['·'])[0].toUpperCase();
-    fila.querySelector('.avatar').textContent = g.tipo==='ingreso' ? '+' : letra;
-  });
+  pintarLista(c);
+  enlazar(c, k, minF, maxF);
+}
 
-  app.querySelectorAll('.selector button').forEach(b=>b.onclick = ()=>{
-    const imp = document.getElementById('g-imp').value, con = document.getElementById('g-con').value, fe = document.getElementById('g-fecha').value;
-    tipoMov = b.dataset.tipo; render();
-    document.getElementById('g-imp').dataset.relleno = '1';
-    document.getElementById('g-imp').value = imp; document.getElementById('g-con').value = con; document.getElementById('g-fecha').value = fe;
+// ---- Lista de movimientos (se repinta sola al buscar, sin perder el foco) ----
+function pintarLista(c){
+  const mes = c.mes;
+  const cont = document.getElementById('lista-movs');
+  let movs = [...mes.gastos.map(g=>({...g,tipo:'gasto'})), ...mes.ingresos.map(g=>({...g,tipo:'ingreso'}))];
+  const q = filtro.q.trim().toLowerCase();
+  const filtrando = q || filtro.tipo!=='todos';
+  if(filtro.tipo==='gasto' || filtro.tipo==='ingreso') movs = movs.filter(g=>g.tipo===filtro.tipo);
+  else if(filtro.tipo.startsWith('cat:')) movs = movs.filter(g=>g.tipo==='gasto' && catDe(g)===filtro.tipo.slice(4));
+  if(q) movs = movs.filter(g=>[g.concepto, g.tarjeta, catInfo(catDe(g)).n].filter(Boolean).join(' ').toLowerCase().includes(q));
+
+  const porDia = {};
+  movs.forEach(g=>{ (porDia[g.fecha] = porDia[g.fecha] || []).push(g); });
+  const fechas = Object.keys(porDia).sort().reverse();
+  let html = '';
+  if(filtrando){
+    const tg = movs.filter(g=>g.tipo==='gasto').reduce((s,g)=>s+g.importe,0);
+    const ti = movs.filter(g=>g.tipo==='ingreso').reduce((s,g)=>s+g.importe,0);
+    html += `<p class="pista">${movs.length} movimiento${movs.length===1?'':'s'}${tg?` · gastado ${fmt(tg)}`:''}${ti?` · ingresado ${fmt(ti)}`:''} · <button class="enlace" id="quitar-filtro">Quitar filtro</button></p>`;
+  } else if(fechas.length) html += '<p class="pista">Toca un movimiento para modificarlo o borrarlo.</p>';
+
+  html += fechas.length ? fechas.map(f=>{
+    const d = new Date(f+'T12:00:00');
+    const diaTxt = d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'}).replace(',','');
+    const etiqueta = (f===isoHoy ? 'Hoy · ' : '') + diaTxt.charAt(0).toUpperCase()+diaTxt.slice(1);
+    const items = porDia[f].slice().sort((a,b)=>(b.hora||0)-(a.hora||0));
+    const gastoDia = items.filter(g=>g.tipo==='gasto' && !esCredito(g)).reduce((s,g)=>s+g.importe,0);
+    const credDia = items.filter(g=>g.tipo==='gasto' && esCredito(g)).reduce((s,g)=>s+g.importe,0);
+    return `<div class="dia"><div class="dia-cab"><span class="dia-nombre">${etiqueta}</span><span class="num dia-total">${[gastoDia>0?'Gastado '+fmt(gastoDia):'', credDia>0?'💳 '+fmt(credDia):''].filter(Boolean).join(' · ')}</span></div>
+      <div class="dia-lista">${items.map(g=>{
+        const concepto = g.concepto || (g.tipo==='ingreso'?'Ingreso':'Sin concepto');
+        const hora = g.hora ? new Date(g.hora).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}) : '';
+        const origen = g.origen==='applepay'?'Apple Pay':g.origen==='cartera'?'Cartera':g.origen==='captura'?'Compra en app':(g.tipo==='ingreso'?'Ingreso':'Manual');
+        const ci = catInfo(catDe(g));
+        const cred = g.tipo==='gasto' && esCredito(g);
+        const meta = [hora, g.tipo==='gasto'?ci.n:'', origen, g.tarjeta, cred && !g.tarjeta ? 'Crédito' : '', g.alLimite?'suma al máximo':''].filter(Boolean).join(' · ');
+        return `<div class="gasto ${g.tipo} ${editMov && editMov.id===g.id?'editando':''}" data-id="${g.id}" data-tipo="${g.tipo}" role="button" tabindex="0" aria-label="Modificar movimiento">
+          <span class="avatar" aria-hidden="true">${g.tipo==='ingreso'?'+':ci.e}</span>
+          <span class="info"><span class="concepto">${esc(concepto)}</span><span class="meta">${esc(meta)}</span>${cred?`<span class="etq-credito">💳 Se cobra el ${fmtFecha(c.cobroCred)}</span>`:''}</span>
+          <span class="imp num ${cred?'credito':''}">${g.tipo==='ingreso'?'+':'−'}${fmt(g.importe)}</span></div>`; }).join('')}</div></div>`;
+  }).join('') : (filtrando ? '<p class="vacio">No hay movimientos que coincidan.</p>' : '<p class="vacio">Aún no has apuntado ningún movimiento este mes. Empieza con el primero más abajo.</p>');
+  cont.innerHTML = html;
+
+  const qf = document.getElementById('quitar-filtro');
+  if(qf) qf.onclick = ()=>{ filtro = {q:'', tipo:'todos'}; document.getElementById('f-q').value=''; document.getElementById('f-tipo').value='todos'; pintarLista(c); };
+  cont.querySelectorAll('.gasto[data-id]').forEach(row=>{
+    const abrir = ()=>{
+      editMov = {id: row.dataset.id, tipo: row.dataset.tipo};
+      tipoMov = row.dataset.tipo;
+      render();
+      document.getElementById('form-mov').scrollIntoView({behavior:'smooth', block:'start'});
+    };
+    row.onclick = abrir;
+    row.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } };
   });
-  document.getElementById('editar').onclick = ()=>{ editandoLimite = true; render(); };
-  document.getElementById('ajustar').onclick = async ()=>{
-    const r = prompt('¿Cuánto te aparece ahora en el banco? (€)', String(Math.round(saldoActual*100)/100).replace('.',','));
+}
+
+// ---- Eventos de la pantalla principal ----
+function enlazar(c, k, minF, maxF){
+  const mes = c.mes;
+  const $ = id => document.getElementById(id);
+
+  const cy = $('copia-ya'); if(cy) cy.onclick = ()=>exportarCopia();
+  $('editar').onclick = ()=>{ editandoLimite = true; render(); window.scrollTo(0,0); };
+  $('ajustar').onclick = async ()=>{
+    const r = prompt('¿Cuánto te aparece ahora en el banco? (€)', String(r2(c.saldoActual)).replace('.',','));
     if(r===null) return;
     const v = num(r);
     if(isNaN(v)){ alert('Escribe solo la cantidad, por ejemplo 1234,56'); return; }
-    mes.saldoInicial = Math.round((v + total - ingresos + fijosCobr)*100)/100;
+    mes.saldoInicial = r2(v - (c.saldoActual - mes.saldoInicial));
     render(); await guardar();
   };
-  // Rellenar el formulario si estamos modificando
+  const vr = $('ver-resumen');
+  if(vr) vr.onclick = ()=>{ vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editMov=null; fijoEdit=null; progEdit=null; render(); window.scrollTo(0,0); };
+
+  // Filtros
+  $('f-q').oninput = e=>{ filtro.q = e.target.value; pintarLista(c); };
+  $('f-tipo').onchange = e=>{ filtro.tipo = e.target.value; pintarLista(c); };
+  document.querySelectorAll('.cat-fila').forEach(b=>b.onclick = ()=>{
+    filtro = {q:'', tipo:'cat:'+b.dataset.cat};
+    $('f-q').value = ''; $('f-tipo').value = filtro.tipo; pintarLista(c);
+    $('sec-movs').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  // Formulario de movimientos
+  document.querySelectorAll('#form-mov .selector button').forEach(b=>b.onclick = ()=>{
+    const imp = $('g-imp').value, con = $('g-con').value, fe = $('g-fecha').value;
+    tipoMov = b.dataset.tipo; render();
+    $('g-imp').dataset.relleno = '1';
+    $('g-imp').value = imp; $('g-con').value = con; $('g-fecha').value = fe;
+  });
   const movEditado = editMov ? (editMov.tipo==='ingreso'?mes.ingresos:mes.gastos).find(g=>g.id===editMov.id) : null;
   if(editMov && !movEditado) editMov = null;
-  if(movEditado && !document.getElementById('g-imp').dataset.relleno){
-    document.getElementById('g-imp').value = movEditado.importe.toFixed(2).replace('.',',');
-    document.getElementById('g-con').value = movEditado.concepto || '';
-    document.getElementById('g-fecha').value = movEditado.fecha;
-    const chk = document.getElementById('g-lim'); if(chk) chk.checked = !!movEditado.alLimite;
+  if(movEditado && !$('g-imp').dataset.relleno){
+    $('g-imp').value = movEditado.importe.toFixed(2).replace('.',',');
+    $('g-con').value = movEditado.concepto || '';
+    $('g-fecha').value = movEditado.fecha;
+    if($('g-lim')) $('g-lim').checked = !!movEditado.alLimite;
+    if($('g-cat')) $('g-cat').value = movEditado.cat || '';
+    if($('g-pago')) $('g-pago').value = esCredito(movEditado) ? 'credito' : 'debito';
   }
-  document.getElementById('importar-ap').onchange = async e=>{
+  const gd = $('g-del');
+  if(gd) gd.onclick = async ()=>{
+    if(!confirm('¿Borrar este movimiento?')) return;
+    if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
+    else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
+    editMov = null; render(); await guardar();
+  };
+  const gc = $('g-cancel'); if(gc) gc.onclick = ()=>{ editMov = null; render(); };
+  const add = async ()=>{
+    const imp = num($('g-imp').value);
+    const fecha = $('g-fecha').value;
+    const err = $('g-err');
+    if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
+    if(!fecha || fecha<minF || fecha>maxF){ err.textContent = 'Elige una fecha de este mes.'; return; }
+    // Al modificar se conservan los datos de origen (hora, tarjeta, Apple Pay…)
+    const base = movEditado ? {...movEditado} : {id: nuevoId()};
+    const mov = {...base, importe: imp, concepto: $('g-con').value.trim(), fecha};
+    if(tipoMov==='ingreso'){ mov.alLimite = $('g-lim').checked; delete mov.cat; }
+    else {
+      delete mov.alLimite; const cat = $('g-cat').value; if(cat) mov.cat = cat; else delete mov.cat;
+      const cred = $('g-pago').value==='credito';
+      // Solo se guarda si cambia lo que se deduce de la tarjeta importada
+      if(cred === /cr[eé]dito/i.test(mov.tarjeta||'')) delete mov.credito; else mov.credito = cred;
+    }
+    const eraEdicion = !!editMov;
+    if(editMov){
+      if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
+      else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
+      editMov = null;
+    }
+    if(tipoMov==='ingreso') mes.ingresos.push(mov); else mes.gastos.push(mov);
+    render(); await guardar();
+    if(!eraEdicion) $('g-imp').focus();
+  };
+  $('g-add').onclick = add;
+  ['g-imp','g-con'].forEach(id=>$(id).onkeydown = e=>{ if(e.key==='Enter') add(); });
+
+  // Importar pagos de los atajos
+  $('importar-ap').onchange = async e=>{
     const f = e.target.files[0]; e.target.value = '';
     if(!f) return;
-    const aviso = document.getElementById('aviso');
     try{
       const r = importarApplePay(await f.text());
       render(); await guardar();
@@ -633,111 +1073,109 @@ function render(){
       if(r.duplicados) msg += ` ${r.duplicados} repetido${r.duplicados===1?'':'s'} (no se ha${r.duplicados===1?'':'n'} vuelto a añadir).`;
       if(r.malos) msg += ` ${r.malos} línea${r.malos===1?'':'s'} no se pudo leer.`;
       alert(msg);
-      aviso.textContent = '';
-    }catch(err){
-      alert('No se pudo leer ese archivo.');
-    }
+    }catch(err){ alert('No se pudo leer ese archivo.'); }
   };
-  const gd = document.getElementById('g-del');
-  if(gd) gd.onclick = async ()=>{
-    if(!confirm('¿Borrar este movimiento?')) return;
-    if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
-    else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
-    editMov = null;
-    render(); await guardar();
-  };
-  const gc = document.getElementById('g-cancel');
-  if(gc) gc.onclick = ()=>{ editMov = null; render(); };
-  app.querySelectorAll('.gasto[data-id]').forEach(row=>{
-    const abrirEdicion = ()=>{
-      editMov = {id: row.dataset.id, tipo: row.dataset.tipo};
-      tipoMov = row.dataset.tipo;
-      render();
-      document.getElementById('form-mov').scrollIntoView({behavior:'smooth', block:'start'});
-    };
-    row.onclick = e=>{ if(e.target.closest('.borrar')) return; abrirEdicion(); };
-    row.onkeydown = e=>{ if((e.key==='Enter'||e.key===' ') && !e.target.closest('.borrar')){ e.preventDefault(); abrirEdicion(); } };
+
+  // Pagos e ingresos fijos
+  document.querySelectorAll('.fijo[data-fid]').forEach(row=>{
+    const abrir = ()=>{ fijoEdit = row.dataset.fid; const f = estado.fijos.find(x=>x.id===fijoEdit); fijoTipo = f?.tipo||'gasto'; render(); $('fijo-form').scrollIntoView({behavior:'smooth', block:'center'}); };
+    row.onclick = abrir; row.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } };
   });
-  const add = async ()=>{
-    const imp = num(document.getElementById('g-imp').value);
-    const fecha = document.getElementById('g-fecha').value;
-    const err = document.getElementById('g-err');
-    if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
-    if(!fecha || fecha<minF || fecha>maxF){ err.textContent = 'Elige una fecha de este mes.'; return; }
-    const mov = {id: editMov ? editMov.id : nuevoId(), importe: imp, concepto: document.getElementById('g-con').value.trim(), fecha};
-    if(tipoMov==='ingreso') mov.alLimite = document.getElementById('g-lim').checked;
-    const eraEdicion = !!editMov;
-    if(editMov){
-      // quitar la versión anterior (puede haber cambiado de gasto a ingreso o al revés)
-      if(editMov.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==editMov.id);
-      else mes.gastos = mes.gastos.filter(g=>g.id!==editMov.id);
-      editMov = null;
-    }
-    if(tipoMov==='ingreso') mes.ingresos.push(mov); else mes.gastos.push(mov);
-    render(); await guardar();
-    if(!eraEdicion) document.getElementById('g-imp').focus();
-  };
-  document.getElementById('g-add').onclick = add;
-  ['g-imp','g-con'].forEach(id=>document.getElementById(id).onkeydown = e=>{ if(e.key==='Enter') add(); });
-  // nombres de pagos fijos con textContent
-  app.querySelectorAll('.fijo-nombre').forEach((el,k)=>{ el.textContent = fijos[k].nombre; });
-  const abrir = document.getElementById('f-abrir');
-  if(abrir) abrir.onclick = ()=>{ fijoFormAbierto = true; render(); document.getElementById('f-nom').focus(); };
-  const cancelar = document.getElementById('f-cancel');
-  if(cancelar) cancelar.onclick = ()=>{ fijoFormAbierto = false; render(); };
-  const fAdd = document.getElementById('f-add');
-  if(fAdd) fAdd.onclick = async ()=>{
-    const nombre = document.getElementById('f-nom').value.trim();
-    const imp = num(document.getElementById('f-imp').value);
-    const dia = parseInt(document.getElementById('f-dia').value,10);
-    const cuoTxt = document.getElementById('f-cuo').value.trim();
+  const fa = $('f-abrir'); if(fa) fa.onclick = ()=>{ fijoEdit = 'nuevo'; fijoTipo = 'gasto'; render(); $('f-nom').focus(); };
+  document.querySelectorAll('#fijo-form [data-ft]').forEach(b=>b.onclick = ()=>{
+    const vals = ['f-nom','f-imp','f-dia','f-cuo','f-aj'].map(id=>$(id)?$(id).value:null);
+    fijoTipo = b.dataset.ft; render();
+    ['f-nom','f-imp','f-dia','f-cuo','f-aj'].forEach((id,i)=>{ if($(id) && vals[i]!==null) $(id).value = vals[i]; });
+  });
+  const fcn = $('f-cancel'); if(fcn) fcn.onclick = ()=>{ fijoEdit = null; render(); };
+  const fad = $('f-add');
+  if(fad) fad.onclick = async ()=>{
+    const nombre = $('f-nom').value.trim();
+    const imp = num($('f-imp').value);
+    const dia = parseInt($('f-dia').value,10);
+    const cuoTxt = $('f-cuo').value.trim();
     const cuotas = cuoTxt ? parseInt(cuoTxt,10) : null;
-    const err = document.getElementById('f-err');
-    if(!nombre){ err.textContent = 'Ponle un nombre al pago.'; return; }
+    const err = $('f-err');
+    if(!nombre){ err.textContent = 'Ponle un nombre.'; return; }
     if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
     if(!(dia>=1 && dia<=31)){ err.textContent = 'El día de cobro tiene que estar entre 1 y 31.'; return; }
     if(cuoTxt && !(cuotas>=1)){ err.textContent = 'El número de cuotas tiene que ser 1 o más, o déjalo vacío.'; return; }
     estado.fijos = estado.fijos || [];
-    estado.fijos.push({id: nuevoId(), nombre, importe: imp, dia, desde: kMes, cuotas});
-    fijoFormAbierto = false;
-    render(); await guardar();
+    if(fijoEdit==='nuevo'){
+      estado.fijos.push({id: nuevoId(), nombre, importe: imp, dia, desde: k, cuotas, tipo: fijoTipo});
+    } else {
+      const f = estado.fijos.find(x=>x.id===fijoEdit);
+      Object.assign(f, {nombre, importe: imp, dia, cuotas, tipo: fijoTipo});
+      const ajTxt = $('f-aj') ? $('f-aj').value.trim() : '';
+      f.ajustes = f.ajustes || {};
+      if(ajTxt){ const aj = num(ajTxt); if(!(aj>=0)){ err.textContent = 'El importe de este mes no es válido.'; return; } f.ajustes[k] = aj; }
+      else delete f.ajustes[k];
+    }
+    fijoEdit = null; render(); await guardar();
   };
-  app.querySelectorAll('.quitar-fijo').forEach(b=>b.onclick = async ()=>{
-    const f = estado.fijos.find(x=>x.id===b.dataset.id);
+  const fdl = $('f-del');
+  if(fdl) fdl.onclick = async ()=>{
+    const f = estado.fijos.find(x=>x.id===fijoEdit);
     if(!f) return;
-    if(idxMes(f.desde) >= idxMes(kMes)){
+    if(idxMes(f.desde) >= idxMes(k)){
       if(!confirm(`¿Quitar «${f.nombre}»? Se borrará por completo.`)) return;
       estado.fijos = estado.fijos.filter(x=>x.id!==f.id);
     } else {
       if(!confirm(`¿Dejar de contar «${f.nombre}» desde ${nombreMes(vista.y,vista.m).toLowerCase()}? Los meses anteriores no cambian.`)) return;
-      const prev = new Date(vista.y, vista.m-1, 1);
-      f.hasta = claveMes(prev.getFullYear(), prev.getMonth());
+      f.hasta = mesAnterior(k);
     }
-    render(); await guardar();
+    fijoEdit = null; render(); await guardar();
+  };
+
+  // Gastos programados
+  document.querySelectorAll('.prog[data-pid]').forEach(row=>{
+    const abrir = ()=>{ progEdit = row.dataset.pid; render(); $('prog-form').scrollIntoView({behavior:'smooth', block:'center'}); };
+    row.onclick = abrir; row.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } };
   });
-  app.querySelectorAll('.borrar:not(.quitar-fijo)').forEach(b=>b.onclick = async ()=>{
-    if(editMov && editMov.id===b.dataset.id) editMov = null;
-    if(b.dataset.tipo==='ingreso') mes.ingresos = mes.ingresos.filter(g=>g.id!==b.dataset.id);
-    else mes.gastos = mes.gastos.filter(g=>g.id!==b.dataset.id);
-    render(); await guardar();
-  });
+  const pa = $('p-abrir'); if(pa) pa.onclick = ()=>{ progEdit = 'nuevo'; render(); $('p-con').focus(); };
+  const pcn = $('p-cancel'); if(pcn) pcn.onclick = ()=>{ progEdit = null; render(); };
+  const pcr = $('p-cred'); if(pcr) pcr.onchange = ()=>{ $('p-max-fila').hidden = pcr.checked; $('p-cred-nota').hidden = !pcr.checked; };
+  const pad_ = $('p-add');
+  if(pad_) pad_.onclick = async ()=>{
+    const concepto = $('p-con').value.trim();
+    const imp = num($('p-imp').value);
+    const fecha = $('p-fecha').value;
+    const cat = $('p-cat').value;
+    const err = $('p-err');
+    if(!concepto){ err.textContent = 'Ponle un nombre.'; return; }
+    if(!(imp>0)){ err.textContent = 'Escribe un importe mayor que cero.'; return; }
+    if(!fecha || fecha < '2026-11-01'){ err.textContent = 'Elige una fecha desde noviembre de 2026.'; return; }
+    estado.programados = estado.programados || [];
+    const credito = $('p-cred').checked;
+    const datos = {concepto, importe: imp, fecha, enMaximo: credito ? true : $('p-max').checked, credito};
+    if(cat) datos.cat = cat;
+    if(progEdit==='nuevo') estado.programados.push({id: nuevoId(), ...datos});
+    else { const p = estado.programados.find(x=>x.id===progEdit); delete p.cat; Object.assign(p, datos); }
+    progEdit = null; render(); await guardar();
+  };
+  const pdl = $('p-del');
+  if(pdl) pdl.onclick = async ()=>{
+    if(!confirm('¿Borrar este gasto programado?')) return;
+    estado.programados = estado.programados.filter(x=>x.id!==progEdit);
+    progEdit = null; render(); await guardar();
+  };
 }
 
-function grafico(mes, nDias, limEf){
+// ---- Gráfico de gasto por día ----
+function grafico(c){
+  const nDias = c.nDias;
   const sumas = Array(nDias).fill(0);
-  mes.gastos.forEach(g=>{ const d = parseInt(g.fecha.slice(8,10),10); if(d>=1&&d<=nDias) sumas[d-1]+=g.importe; });
-  const media = limEf/nDias;
-  const max = Math.max(media*1.6, ...sumas);
+  c.gastosDeb.forEach(g=>{ const d = parseInt(g.fecha.slice(8,10),10); if(d>=1&&d<=nDias) sumas[d-1]+=g.importe; });
+  const media = Math.max(c.base, 0);
+  const max = Math.max(media*1.6, ...sumas, 1);
   const W=360, H=140, top=10, base=H-22, bw=W/nDias;
   const y = v => base - (v/max)*(base-top);
-  const esActual = vista.y===hoy.getFullYear() && vista.m===hoy.getMonth();
   let barras = '';
   sumas.forEach((v,i)=>{
     const h = base - y(v);
-    const c = v>media ? 'var(--warn)' : 'var(--good)';
-    const esHoy = esActual && i===hoy.getDate()-1;
-    if(v>0) barras += `<rect x="${i*bw+1}" y="${y(v)}" width="${bw-2}" height="${h}" rx="2" fill="${c}"><title>Día ${i+1}: ${fmt(v)}</title></rect>`;
-    if(esHoy) barras += `<rect x="${i*bw+0.5}" y="${top}" width="${bw-1}" height="${base-top}" fill="none" stroke="var(--accent)" stroke-dasharray="2 2" rx="2"/>`;
+    const col = v>media ? 'var(--warn)' : 'var(--good)';
+    if(v>0) barras += `<rect x="${i*bw+1}" y="${y(v)}" width="${bw-2}" height="${h}" rx="2" fill="${col}"><title>Día ${i+1}: ${fmt(v)}</title></rect>`;
+    if(c.esActual && i===hoy.getDate()-1) barras += `<rect x="${i*bw+0.5}" y="${top}" width="${bw-1}" height="${base-top}" fill="none" stroke="var(--accent)" stroke-dasharray="2 2" rx="2"/>`;
     if((i+1)%5===0 || i===0) barras += `<text x="${i*bw+bw/2}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--muted)">${i+1}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gasto diario del mes frente a la media permitida">
@@ -748,13 +1186,66 @@ function grafico(mes, nDias, limEf){
   </svg>`;
 }
 
+// =====================================================================
+//  Copias de seguridad y exportación
+// =====================================================================
+async function compartirArchivo(contenido, nombre, tipo, titulo){
+  const blob = new Blob([contenido],{type:tipo});
+  const file = new File([blob], nombre, {type:tipo});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:titulo});
+      return true;
+    }
+  }catch(e){ if(e && e.name==='AbortError') return false; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  return true;
+}
+async function exportarCopia(){
+  const ok = await compartirArchivo(JSON.stringify(estado,null,2), `presupuesto-${isoHoy}.json`, 'application/json', 'Copia de mi presupuesto');
+  if(ok){ estado.ultimaCopia = Date.now(); await guardar(); render(); }
+}
+function pintarUltimaCopia(){
+  const el = document.getElementById('ultima-copia');
+  if(!el) return;
+  if(!estado.ultimaCopia){ el.textContent = 'Aún no has hecho ninguna copia.'; return; }
+  const dias = Math.floor((Date.now()-estado.ultimaCopia)/DIA_MS);
+  el.textContent = dias===0 ? 'Última copia: hoy.' : dias===1 ? 'Última copia: ayer.' : `Última copia: hace ${dias} días.`;
+}
+function exportarCSV(todos){
+  const claves = todos ? Object.keys(estado.meses).sort() : [claveMes(vista.y,vista.m)];
+  const cel = v => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
+  const imp = n => n.toFixed(2).replace('.',',');
+  const fFecha = f => f.split('-').reverse().join('/');
+  const filas = [['Fecha','Tipo','Concepto','Categoría','Importe','Origen','Tarjeta']];
+  claves.forEach(k=>{
+    const mes = estado.meses[k]; if(!mes) return;
+    const lista = [];
+    (mes.gastos||[]).forEach(g=>lista.push([g.fecha, esCredito(g)?'Gasto con crédito':'Gasto',g.concepto||'',catInfo(catDe(g)).n,-g.importe,
+      g.origen==='applepay'?'Apple Pay':g.origen==='cartera'?'Cartera':g.origen==='captura'?'Compra en app':'Manual', g.tarjeta||'']));
+    (mes.ingresos||[]).forEach(g=>lista.push([g.fecha,'Ingreso',g.concepto||'','',g.importe,'Manual','']));
+    fijosDelMes(k).forEach(f=>lista.push([f.fecha, f.tipo==='ingreso'?'Ingreso fijo':'Pago fijo', f.nombre,'', f.tipo==='ingreso'?f.importe:-f.importe,'Fijo','']));
+    progsCredito(k).forEach(p=>lista.push([p.fecha,'Gasto programado con crédito',p.concepto,catInfo(catDe(p)).n,-p.importe,'Programado','']));
+    progsConLiq(k).forEach(p=>lista.push([p.fecha, p.auto?'Cargo tarjeta de crédito':'Gasto programado', p.concepto, p.auto?'':catInfo(catDe(p)).n, -p.importe, p.auto?'Automático':'Programado','']));
+    lista.sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0).forEach(r=>filas.push([fFecha(r[0]),r[1],r[2],r[3],imp(r[4]),r[5],r[6]]));
+  });
+  const csv = '\ufeff' + filas.map(r=>r.map(cel).join(';')).join('\r\n');
+  const nombre = todos ? `movimientos-todos-${isoHoy}.csv` : `movimientos-${claves[0]}.csv`;
+  compartirArchivo(csv, nombre, 'text/csv', 'Movimientos');
+}
+
 document.getElementById('prev').onclick = ()=>{
   if(vista.y*12+vista.m <= INICIO.y*12+INICIO.m) return;
-  vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; editMov=null; render();
+  vista.m--; if(vista.m<0){vista.m=11;vista.y--;} editandoLimite=false; editMov=null; fijoEdit=null; progEdit=null; render();
 };
-document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; editMov=null; render(); };
+document.getElementById('next').onclick = ()=>{ vista.m++; if(vista.m>11){vista.m=0;vista.y++;} editandoLimite=false; editMov=null; fijoEdit=null; progEdit=null; render(); };
 
-// Arranque: primero copia local, luego base de datos privada si está disponible
+// =====================================================================
+//  Arranque
+// =====================================================================
 try{ const raw = localStorage.getItem(LS_KEY); if(raw) estado = JSON.parse(raw); }catch(e){}
 if(!estado.meses) estado = {meses:{}};
 if(!estado.fijos){
@@ -763,29 +1254,24 @@ if(!estado.fijos){
     {id:'pc', nombre:'PC nuevo', importe:354.25, dia:3, desde:'2026-11', cuotas:9},
     {id:'ipad', nombre:'iPad (última cuota)', importe:175, dia:26, desde:'2026-11', cuotas:1}
   ];
-  try{ localStorage.setItem(LS_KEY, JSON.stringify(estado)); }catch(e){}
 }
+if(!estado.programados){
+  // Preventas de Amazon: se cargan en la tarjeta de crédito el 26 de noviembre y el banco las cobra el 7 de diciembre
+  estado.programados = [
+    {id:'preventa1', concepto:'Preventa Amazon', importe:64.95, fecha:'2026-11-26', enMaximo:true, credito:true, cat:'compras'},
+    {id:'preventa2', concepto:'Preventa Amazon (2)', importe:295.95, fecha:'2026-11-26', enMaximo:true, credito:true, cat:'compras'}
+  ];
+}
+if(!estado.ajustes) estado.ajustes = {ahorro:0};
+if(!estado.creado) estado.creado = Date.now();
+try{ localStorage.setItem(LS_KEY, JSON.stringify(estado)); }catch(e){}
 render();
 
-// Pedir almacenamiento persistente para que iOS no borre los datos
 if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); }
 
-// Copia de seguridad
-document.getElementById('exportar').onclick = async ()=>{
-  const nombre = `presupuesto-${isoHoy}.json`;
-  const blob = new Blob([JSON.stringify(estado,null,2)],{type:'application/json'});
-  const file = new File([blob], nombre, {type:'application/json'});
-  try{
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:'Copia de mi presupuesto'});
-      return;
-    }
-  }catch(e){ if(e && e.name==='AbortError') return; }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = nombre;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-};
+document.getElementById('exportar').onclick = ()=>exportarCopia();
+document.getElementById('csv-mes').onclick = ()=>exportarCSV(false);
+document.getElementById('csv-todo').onclick = ()=>exportarCSV(true);
 document.getElementById('importar').onchange = async e=>{
   const f = e.target.files[0]; e.target.value = '';
   if(!f) return;
@@ -795,6 +1281,8 @@ document.getElementById('importar').onchange = async e=>{
     if(!datos || typeof datos.meses!=='object') throw 0;
     if(!confirm('Esto sustituirá los datos actuales por los de la copia. ¿Continuar?')) return;
     estado = datos; editandoLimite = false;
+    if(!estado.programados) estado.programados = [];
+    if(!estado.ajustes) estado.ajustes = {ahorro:0};
     render(); await guardar();
     aviso.textContent = 'Copia restaurada.';
   }catch(err){
@@ -802,7 +1290,6 @@ document.getElementById('importar').onchange = async e=>{
   }
 };
 
-// Modo sin conexión
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
