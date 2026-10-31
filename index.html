@@ -338,7 +338,8 @@ function importarApplePay(texto){
       const fecha = ajustarFecha(parseFecha(partes[0]));
       const info = parseCaptura(partes.slice(2).join(';'));
       if(!fecha || isNaN(info.importe) || info.importe<=0){ malos++; return; }
-      const hl = huella(/^2026-10-3[01]/.test(linea) ? linea+'#nov' : linea); if(vistos.has(hl)) return;
+      // Clave nueva (#c2) para volver a revisar capturas que versiones anteriores descartaron por error
+      const hl = huella(linea + '#c2'); if(vistos.has(hl)) return;
       vistos.add(hl); estado.importados.push(hl);
       const [y,mm] = fecha.split('-').map(Number);
       if(y*12+(mm-1) < INICIO.y*12+INICIO.m){ ignorados++; return; }
@@ -348,11 +349,15 @@ function importarApplePay(texto){
       mesK.ingresos = mesK.ingresos || [];
       const hora = Date.parse(partes[0].trim().replace(' ','T')) || null;
       const concepto = [info.app, info.articulo].filter(Boolean).join(': ') || 'Compra sin detalle';
-      // Si se hacen dos capturas de la misma ventana, solo cuenta una
-      const repetida = hora && mesK.gastos.some(g => g.origen==='captura' && g.hora && g.concepto===concepto
-        && Math.abs(g.importe-info.importe)<0.005 && Math.abs(g.hora-hora) <= 60*1000);
-      if(repetida){ duplicados++; return; }
-      mesK.gastos.push({id: nuevoId(), importe: info.importe, concepto, fecha, origen:'captura', hora, tarjeta: info.tarjeta});
+      // Huella del texto de la captura: dos capturas de la MISMA ventana dan el mismo texto;
+      // dos compras distintas cambian algo (por ejemplo, las joyas de pago que tienes).
+      const hOCR = huella(partes.slice(2).join(';').replace(/\s+/g,' ').trim());
+      const mismoImporte = g => Math.abs(g.importe-info.importe) < 0.005;
+      // Ya importada antes (misma hora exacta): no se vuelve a añadir
+      if(hora && mesK.gastos.some(g => g.origen==='captura' && g.hora===hora && mismoImporte(g))) return;
+      // Captura repetida de la misma ventana (texto idéntico en menos de 2 minutos)
+      if(hora && mesK.gastos.some(g => g.origen==='captura' && g.hOCR===hOCR && mismoImporte(g) && Math.abs(g.hora-hora) <= 2*60*1000)){ duplicados++; return; }
+      mesK.gastos.push({id: nuevoId(), importe: info.importe, concepto, fecha, origen:'captura', hora, tarjeta: info.tarjeta, hOCR});
       nuevos++;
       return;
     }
