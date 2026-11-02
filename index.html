@@ -506,8 +506,11 @@ function calcMes(k){
   const progsCred = progsCredito(k);
   const total = suma(gastosDeb), totalCred = suma(gastosCred) + suma(progsCred);
   const ingresos = totalIngresos(mes), extra = extraLimite(mes);
-  const limEf = mes.limite + extra;
-  const diario = limEf - progMax;            // presupuesto para el día a día
+  // Fijos marcados para el máximo: los pagos se reservan desde el día 1; los ingresos lo amplían
+  const fGmax = suma(fG.filter(f=>f.enMaximo)), extraF = suma(fI.filter(f=>f.alLimite));
+  const limEf = mes.limite + extra + extraF;
+  const reserva = progMax + fGmax;
+  const diario = limEf - reserva;            // presupuesto para el día a día
   const queda = diario - total;
   const fGtot = suma(fG), fItot = suma(fI), progTot = suma(progs);
   const fGcob = suma(fG.filter(cobrado)), fIcob = suma(fI.filter(cobrado)), progCob = suma(progs.filter(cobrado));
@@ -517,7 +520,7 @@ function calcMes(k){
   const base = nDias ? diario / nDias : 0;
   const esActual = y===hoy.getFullYear() && (m-1)===hoy.getMonth();
   const esPasado = new Date(y, m, 1) <= new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-  return {mes,k,y,m,nDias,fijos,fG,fI,progs,progMax,total,totalCred,gastosDeb,gastosCred,progsCred,cobroCred: primerLunes(mesSiguiente(k)),ingresos,extra,limEf,diario,queda,
+  return {mes,k,y,m,nDias,fijos,fG,fI,progs,progMax,fGmax,extraF,reserva,total,totalCred,gastosDeb,gastosCred,progsCred,cobroCred: primerLunes(mesSiguiente(k)),ingresos,extra,limEf,diario,queda,
     fGtot,fItot,progTot,fGcob,fIcob,progCob,saldoActual,saldoFinal,saldoCierre,base,esActual,esPasado};
 }
 // Hucha diaria al final del día d
@@ -551,9 +554,12 @@ function recomendar(k, saldoAhora, ahorro){
   const ingNoLim = ingresos - extra;
   // Los ingresos fijos que aún no han llegado (como la nómina a fin de mes) no se cuentan para gastar:
   // así nunca te quedas en negativo antes de cobrarlos.
-  const fIcob = suma(fI.filter(cobrado)), fIpend = suma(fI) - fIcob;
-  const M = saldoInicio + ingNoLim + fIcob - suma(fG) - progFuera - ahorro;
-  return {M: r2(M), saldoInicio: r2(saldoInicio), ingresos: r2(ingNoLim + fIcob), ingPend: r2(fIpend), pagos: r2(suma(fG)), progFuera: r2(progFuera), progMax: r2(progMax), ahorro};
+  // Los ingresos fijos que suman al máximo ya lo amplían por su cuenta; los pagos fijos que cuentan en el máximo van dentro de él
+  const fInoLim = fI.filter(f=>!f.alLimite);
+  const fIcob = suma(fInoLim.filter(cobrado)), fIpend = suma(fInoLim) - fIcob;
+  const fGfuera = suma(fG.filter(f=>!f.enMaximo)), fGmax = suma(fG.filter(f=>f.enMaximo));
+  const M = saldoInicio + ingNoLim + fIcob - fGfuera - progFuera - ahorro;
+  return {M: r2(M), saldoInicio: r2(saldoInicio), ingresos: r2(ingNoLim + fIcob), ingPend: r2(fIpend), pagos: r2(fGfuera), progFuera: r2(progFuera), progMax: r2(progMax + fGmax), ahorro};
 }
 
 async function guardar(){
@@ -603,7 +609,7 @@ function renderConfig(app, k){
     const filas = [
       ['Dinero en el banco al empezar el mes', r.saldoInicio, ''],
       r.ingresos ? ['Ingresos ya cobrados este mes', r.ingresos, '+'] : null,
-      r.pagos ? ['Pagos fijos', r.pagos, '−'] : null,
+      r.pagos ? ['Pagos fijos (fuera del máximo)', r.pagos, '−'] : null,
       r.progFuera ? ['Gastos programados aparte', r.progFuera, '−'] : null,
       a ? ['Ahorro', a, '−'] : null
     ].filter(Boolean);
@@ -613,7 +619,7 @@ function renderConfig(app, k){
       <p class="rec-cifra num">${fmt(Math.max(r.M,0))}</p>
       <div class="rec-desglose">${filas.map(f=>`<div><span>${f[2]} ${f[0]}</span><span class="num">${fmt(f[1])}</span></div>`).join('')}</div>
       ${r.ingPend ? `<p class="rec-nota">No cuenta ${fmt(r.ingPend)} de ingresos fijos que aún no has cobrado este mes (como la nómina): se quedarán como ahorro o para el mes siguiente.</p>`:''}
-      ${r.progMax ? `<p class="rec-nota">${fmt(r.progMax)} de ese máximo ya están reservados para gastos programados (preventas, cargo de la tarjeta de crédito…).</p>`:''}
+      ${r.progMax ? `<p class="rec-nota">${fmt(r.progMax)} de ese máximo ya están reservados para pagos fijos y gastos programados que cuentan en él (preventas, cargo de la tarjeta de crédito…).</p>`:''}
       ${!ok ? `<p class="rec-nota">Con tus pagos de este mes no te queda margen para el día a día. Prueba a reducir el ahorro.</p>`:''}
       ${ok ? `<button class="usar-rec" id="usar-rec">Usar ${fmt(r.M)}</button>`:''}
     </div>`;
@@ -652,11 +658,11 @@ function bloqueDiario(c){
   if(c.esPasado && !c.esActual) return bloqueResumen(c);
   if(c.diario <= 0){
     return `<div class="diario mal"><p class="etq-diario">Sin margen para el día a día</p><p class="grande num negativo">${fmt(c.diario)}</p>
-      <p class="sub">Los gastos programados que cuentan en tu máximo ocupan todo el presupuesto del mes. Sube el máximo o márcalos como «aparte».</p></div>`;
+      <p class="sub">Los pagos fijos y gastos programados que cuentan en tu máximo ocupan todo el presupuesto del mes. Sube el máximo o márcalos para que no cuenten.</p></div>`;
   }
   if(!c.esActual){
     // Mes que aún no ha empezado: lo que queda (ya restado lo apuntado) repartido entre todos sus días
-    const descontado = [c.total?`${fmt(c.total)} ya apuntados`:'', c.progMax?`${fmt(c.progMax)} de gastos programados`:''].filter(Boolean).join(' y ');
+    const descontado = [c.total?`${fmt(c.total)} ya apuntados`:'', c.reserva?`${fmt(c.reserva)} reservados`:''].filter(Boolean).join(' y ');
     return `<div class="diario"><p class="etq-diario">Podrás gastar</p><p class="grande num">${fmt(c.queda / c.nDias)} al día</p>
       <p class="sub">durante los ${c.nDias} días del mes${descontado?` · descontados ${descontado}`:''}</p></div>`;
   }
@@ -684,8 +690,8 @@ function bloqueResumen(c){
   const ahorrado = c.saldoCierre - c.mes.saldoInicial;
   const prev = calcMes(mesAnterior(c.k));
   let comp = '';
-  if(prev && prev.total + prev.progMax > 0){
-    const a = c.total + c.progMax, b = prev.total + prev.progMax;
+  if(prev && prev.total + prev.reserva > 0){
+    const a = c.total + c.reserva, b = prev.total + prev.reserva;
     const pct = Math.round((a-b)/b*100);
     const [py,pm] = prev.k.split('-').map(Number);
     comp = `<div class="res-fila"><span>Frente a ${nombreMes(py,pm-1).split(' ')[0].toLowerCase()}</span><span class="num ${pct>0?'txt-mal':'txt-bien'}">${pct>0?'+':''}${pct} %</span></div>`;
@@ -695,7 +701,7 @@ function bloqueResumen(c){
     <p class="etq-diario">Resumen del mes</p>
     <p class="grande num ${dentro?'':'negativo'}">${dentro?`Te sobraron ${fmt(c.queda)}`:`Te pasaste ${fmt(-c.queda)}`}</p>
     <div class="res-tabla">
-      <div class="res-fila"><span>Gastado del máximo</span><span class="num">${fmt(c.total + c.progMax)} de ${fmt(c.limEf)}</span></div>
+      <div class="res-fila"><span>Gastado del máximo</span><span class="num">${fmt(c.total + c.reserva)} de ${fmt(c.limEf)}</span></div>
       <div class="res-fila"><span>${ahorrado>=0?'Ahorrado en el banco':'El banco bajó'}</span><span class="num ${ahorrado>=0?'txt-bien':'txt-mal'}">${fmt(Math.abs(ahorrado))}</span></div>
       <div class="res-fila"><span>Días en rojo</span><span class="num">${rojo.n} de ${rojo.de}</span></div>
       ${mayor?`<div class="res-fila"><span>Mayor gasto</span><span class="num">${esc(mayor.concepto||'Sin concepto')} · ${fmt(mayor.importe)}</span></div>`:''}
@@ -705,17 +711,17 @@ function bloqueResumen(c){
 }
 
 function bloqueBarra(c){
-  const pctRes = Math.min(100, c.progMax / c.limEf * 100);
+  const pctRes = Math.min(100, c.reserva / c.limEf * 100);
   const pctGas = Math.min(100 - pctRes, Math.max(0, c.total / c.limEf * 100));
   const diaHoy = c.esActual ? hoy.getDate() : (c.esPasado ? c.nDias : 0);
-  const ritmoPct = Math.min(100, (c.progMax + c.base*diaHoy) / c.limEf * 100);
+  const ritmoPct = Math.min(100, (c.reserva + c.base*diaHoy) / c.limEf * 100);
   const color = c.queda < 0 ? 'var(--bad)' : (c.esActual && pctRes+pctGas > ritmoPct+3 ? 'var(--warn)' : 'var(--good)');
   return `<div class="barra" role="img" aria-label="Gastado ${Math.round(pctRes+pctGas)} % del máximo">
       ${pctRes>0?`<div class="reservado" style="width:${pctRes}%"></div>`:''}
       <div class="lleno" style="left:${pctRes}%;width:${pctGas}%;background:${color}"></div>
       ${c.esActual?`<div class="ritmo" style="left:${ritmoPct}%"></div>`:''}
     </div>
-    <div class="leyenda"><span>Gastado ${fmt(c.total)}</span>${c.progMax?`<span><i class="muestra"></i>Reservado ${fmt(c.progMax)}</span>`:''}${c.esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>`;
+    <div class="leyenda"><span>Gastado ${fmt(c.total)}</span>${c.reserva?`<span><i class="muestra"></i>Reservado ${fmt(c.reserva)}</span>`:''}${c.esActual?'<span>La línea marca dónde deberías ir hoy</span>':''}</div>`;
 }
 
 function avisoCopia(){
@@ -747,7 +753,8 @@ function bloqueCategorias(c){
 function filaFijo(f){
   const sub = (cobrado(f) ? (f.tipo==='ingreso'?'Cobrado':'Cobrado') : 'Pendiente') +
     (f.cuotas===1 ? ' · pago único' : f.cuotas ? ` · cuota ${f.numCuota} de ${f.cuotas}` : ' · todos los meses') +
-    (f.ajustado ? ' · importe cambiado este mes' : '');
+    (f.ajustado ? ' · importe cambiado este mes' : '') +
+    (f.tipo!=='ingreso' && f.enMaximo ? ' · cuenta en tu máximo' : '') + (f.tipo==='ingreso' && f.alLimite ? ' · suma a tu máximo' : '');
   return `<div class="fijo ${f.tipo} ${cobrado(f)?'hecho':''} ${fijoEdit===f.id?'editando':''}" data-fid="${f.id}" role="button" tabindex="0">
     <div class="fijo-dia num"><span>${f.diaReal}</span></div>
     <div class="fijo-info"><span class="fijo-nombre">${esc(f.nombre)}</span><span class="fijo-sub">${sub}</span></div>
@@ -767,6 +774,9 @@ function formFijo(k){
     <label>Importe (€)<input id="f-imp" class="importe" type="text" inputmode="decimal" placeholder="0,00" value="${f?String(f.importe).replace('.',','):''}"></label>
     <label>Día de cobro<input id="f-dia" type="text" inputmode="numeric" placeholder="3" value="${f?f.dia:''}"></label>
     <label class="ancho">Número de cuotas (vacío si es todos los meses)<input id="f-cuo" type="text" inputmode="numeric" placeholder="Todos los meses" value="${f&&f.cuotas?f.cuotas:''}"></label>
+    <label class="ancho check"><input id="f-max" type="checkbox" ${f && (fijoTipo==='ingreso' ? f.alLimite : f.enMaximo) ? 'checked':''}> <span>${fijoTipo==='ingreso'
+      ? 'Sumarlo a lo que puedo gastar en el día a día (se suma desde el día 1 del mes, aunque lo cobres más tarde)'
+      : 'Cuenta en mi máximo de gasto del día a día (se reserva desde el día 1 del mes)'}</span></label>
     ${f?`<label class="ancho">Importe solo en ${nombreMes(y,m-1).toLowerCase()} (opcional, para recibos que cambian)<input id="f-aj" class="importe" type="text" inputmode="decimal" placeholder="El de siempre" value="${ajuste}"></label>`:''}
     <p class="error" id="f-err"></p>
     <button class="secundario-btn" id="f-cancel">Cancelar</button>
@@ -842,7 +852,7 @@ function render(){
     <div class="hero">
       <p class="quedan">${c.queda>=0?'Te quedan':'Vas por encima'}</p>
       <p class="cifra num ${c.queda<0?'negativo':''}">${fmtGrande(Math.abs(c.queda))}</p>
-      <p class="de">de ${fmt(c.limEf)}${c.extra>0?` (${fmt(mes.limite)} + ${fmt(c.extra)} extra)`:''} · <button id="editar">editar</button></p>
+      <p class="de">de ${fmt(c.limEf)}${(c.extra+c.extraF)>0?` (${fmt(mes.limite)} + ${fmt(c.extra+c.extraF)} extra)`:''} · <button id="editar">editar</button></p>
       ${bloqueBarra(c)}
       ${bloqueDiario(c)}
       <div class="banco">
@@ -894,7 +904,7 @@ function render(){
 
     <section>
       <div class="cab-seccion"><h2>Pagos e ingresos fijos</h2>${c.fGtot?`<span class="num total-fijos">−${fmt(c.fGtot)}</span>`:''}</div>
-      <p class="copia-nota">Se descuentan (o suman) a tu dinero en el banco el día de cobro, pero no cuentan en lo que puedes gastar al día. Toca uno para modificarlo.</p>
+      <p class="copia-nota">Se descuentan (o suman) a tu dinero en el banco el día de cobro. Solo cuentan en lo que puedes gastar al día si los marcas para ello. Toca uno para modificarlo.</p>
       ${c.fG.length ? `<p class="subtitulo">Pagos</p>${c.fG.map(filaFijo).join('')}` : ''}
       ${c.fI.length ? `<p class="subtitulo">Ingresos</p>${c.fI.map(filaFijo).join('')}` : ''}
       ${!c.fijos.length ? '<p class="vacio">No tienes pagos ni ingresos fijos este mes.</p>' : ''}
@@ -1093,8 +1103,10 @@ function enlazar(c, k, minF, maxF){
   const fa = $('f-abrir'); if(fa) fa.onclick = ()=>{ fijoEdit = 'nuevo'; fijoTipo = 'gasto'; render(); $('f-nom').focus(); };
   document.querySelectorAll('#fijo-form [data-ft]').forEach(b=>b.onclick = ()=>{
     const vals = ['f-nom','f-imp','f-dia','f-cuo','f-aj'].map(id=>$(id)?$(id).value:null);
+    const marcado = $('f-max').checked;
     fijoTipo = b.dataset.ft; render();
     ['f-nom','f-imp','f-dia','f-cuo','f-aj'].forEach((id,i)=>{ if($(id) && vals[i]!==null) $(id).value = vals[i]; });
+    $('f-max').checked = marcado;
   });
   const fcn = $('f-cancel'); if(fcn) fcn.onclick = ()=>{ fijoEdit = null; render(); };
   const fad = $('f-add');
@@ -1110,11 +1122,14 @@ function enlazar(c, k, minF, maxF){
     if(!(dia>=1 && dia<=31)){ err.textContent = 'El día de cobro tiene que estar entre 1 y 31.'; return; }
     if(cuoTxt && !(cuotas>=1)){ err.textContent = 'El número de cuotas tiene que ser 1 o más, o déjalo vacío.'; return; }
     estado.fijos = estado.fijos || [];
+    const marca = $('f-max').checked;
+    const extraDatos = fijoTipo==='ingreso' ? {alLimite: marca} : {enMaximo: marca};
     if(fijoEdit==='nuevo'){
-      estado.fijos.push({id: nuevoId(), nombre, importe: imp, dia, desde: k, cuotas, tipo: fijoTipo});
+      estado.fijos.push({id: nuevoId(), nombre, importe: imp, dia, desde: k, cuotas, tipo: fijoTipo, ...extraDatos});
     } else {
       const f = estado.fijos.find(x=>x.id===fijoEdit);
-      Object.assign(f, {nombre, importe: imp, dia, cuotas, tipo: fijoTipo});
+      delete f.alLimite; delete f.enMaximo;
+      Object.assign(f, {nombre, importe: imp, dia, cuotas, tipo: fijoTipo, ...extraDatos});
       const ajTxt = $('f-aj') ? $('f-aj').value.trim() : '';
       f.ajustes = f.ajustes || {};
       if(ajTxt){ const aj = num(ajTxt); if(!(aj>=0)){ err.textContent = 'El importe de este mes no es válido.'; return; } f.ajustes[k] = aj; }
